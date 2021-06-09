@@ -1,3 +1,4 @@
 bin
 obj
 _other_files
+.vscode/*
