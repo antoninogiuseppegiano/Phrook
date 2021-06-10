@@ -62,7 +62,7 @@ namespace Phrook
                     context.Response.Redirect("/Books");
                 });
 				//redirection ends
-				endpoints.MapControllerRoute("default", "{controller=Books}/{action=Index}/{isbn?}");
+				endpoints.MapControllerRoute("default", "{controller=Books}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

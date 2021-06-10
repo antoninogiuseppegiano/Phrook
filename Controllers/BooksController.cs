@@ -24,9 +24,9 @@ namespace Phrook.Controllers
 		}
 
 		// /Books/Detail/?isbn
-		public IActionResult Detail(string isbn) 
+		public IActionResult Detail(int id) 
 		{
-			BookDetailViewModel  book = bookService.GetBook(isbn);
+			BookDetailViewModel  book = bookService.GetBook(id);
 			//return the view /views/Books/Index
 			string title;
 			if(book.Title.Length > 5) {

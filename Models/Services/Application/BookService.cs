@@ -7,14 +7,14 @@ namespace Phrook.Models.Services.Application
 {
 	public class BookService : IBookService
 	{
-		public BookDetailViewModel GetBook(string isbn)
+		public BookDetailViewModel GetBook(int id)
 		{
 			var rand = new Random();
 			var book = new BookDetailViewModel
 			{
-				Id = Convert.ToInt32(isbn),
-				ISBN = $"{isbn}",
-				Title = $"Libro {isbn}",
+				Id = Convert.ToInt32(id),
+				ISBN = $"{id}{id}{id}{id}",
+				Title = $"Libro {id}",
 				Author = $"Autore Tizio",
 				ImagePath = "/logo-phrook-color.png",
 				Rating = rand.Next(10, 50)/10.0,

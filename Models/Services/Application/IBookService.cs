@@ -6,6 +6,6 @@ namespace Phrook.Models.Services.Application
     public interface IBookService
     {
          List<BookViewModel> GetBooks();
-         BookDetailViewModel GetBook(string isbn);
+         BookDetailViewModel GetBook(int id);
     }
 }
