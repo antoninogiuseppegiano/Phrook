@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Phrook.Models.Services.Application;
 
 namespace Phrook
 {
@@ -20,6 +21,7 @@ namespace Phrook
         {
 			services.AddRazorPages();
 			services.AddMvc();
+			services.AddTransient<IBookService, BookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,7 +62,7 @@ namespace Phrook
                     context.Response.Redirect("/Books");
                 });
 				//redirection ends
-				endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+				endpoints.MapControllerRoute("default", "{controller=Books}/{action=Index}/{isbn?}");
                 endpoints.MapRazorPages();
             });
         }

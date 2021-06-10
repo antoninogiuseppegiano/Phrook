@@ -1,0 +1,43 @@
+@model List<BookViewModel>
+<h1>La tua libreria</h1>
+
+@foreach (BookViewModel book in Model)
+{
+<hr>
+<div class="row book-library">
+    <div class="col-md-1">
+        <img src="~/logo.svg" width="52" height="52">
+    </div>
+    <div class="col-md-4">
+        <h2>@book.Title</h2>
+        <author>@book.Author</author>
+    </div>
+	<div class="col-md-1 d-flex align-items-center">
+        @book.ReadingState
+    </div>
+    <div class="col-md-2 d-flex align-items-center rating" title="@book.Rating">
+		@for(int i = 1; i <= 5; i++) 
+		{
+			if(book.Rating >= i) 
+			{
+				<i class="fas fa-star"></i>
+			}
+			else if (book.Rating > i -1 ) 
+			{
+				<i class="fas fa-star-half-alt"></i>
+			}
+			else 
+			{
+				<i class="far fa-star"></i>
+			}
+		}
+		
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+        @book.Tag
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+      <a class="btn btn-outline-primary" asp-action="Detail" asp-route-isbn="@book.ISBN">Dettaglio</a>  
+    </div>
+</div>
+}
