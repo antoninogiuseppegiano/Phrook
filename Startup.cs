@@ -7,38 +7,62 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Phrook.Models.Options;
 using Phrook.Models.Services.Application;
+using Phrook.Models.Services.Infrastructure;
 
 namespace Phrook
 {
-    public class Startup
-    {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
+	public class Startup
+	{
+		public IConfiguration Configuration { get; }
+		// private readonly IOptionsMonitor<ConnectionStringsOptions> connectionStringOptions;
+		public Startup(IConfiguration configuration/*, IOptionsMonitor<ConnectionStringsOptions> connectionStringOptions */)
+		{
+			//this.connectionStringOptions = connectionStringOptions;
+			this.Configuration = configuration;
+		}
+
+		// This method gets called by the runtime. Use this method to add services to the container.
+		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+		public void ConfigureServices(IServiceCollection services)
+		{
 			services.AddRazorPages();
 			services.AddMvc();
-			services.AddTransient<IBookService, BookService>();
-        }
+			services.AddTransient<IBookService, EfCoreBookService>();
+			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>
+			{
+				// string connectionString = Configuration.GetSection("ConnectionStrings").GetValue<string>("Default");
+				string connectionString = Configuration["ConnectionStrings:Default"];
+				// string connectionString = connectionStringOptions.CurrentValue.Default;
+				optionsBuilder.UseSqlite(connectionString);
+			});
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Microsoft.AspNetCore.Hosting.IApplicationLifetime lifetime)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-				
+			#region OPTIONS
+			// services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
+			#endregion
+		}
+
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+
 				//Updating a file for triggering BrowserSync and reload the page
 				lifetime.ApplicationStarted.Register(() =>
-                {
-                    string filePath = Path.Combine(env.ContentRootPath, "bin/reload.txt");
-                    File.WriteAllText(filePath, DateTime.Now.ToString());
-                });
-            }
-			else 
+				{
+					string filePath = Path.Combine(env.ContentRootPath, "bin/reload.txt");
+					File.WriteAllText(filePath, DateTime.Now.ToString());
+				});
+			}
+			else
 			{
 				//TODO: levare commento per gestione errori
 				/* app.UseExceptionHandler(new ExceptionHandlerOptions
@@ -49,22 +73,22 @@ namespace Phrook
 			}
 
 			app.UseHttpsRedirection();
-			
+
 			app.UseStaticFiles();
 
-            app.UseRouting();
+			app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
+			app.UseEndpoints(endpoints =>
+			{
 				// redirection starts
-                endpoints.MapGet("/", async context =>
-                {
-                    context.Response.Redirect("/Books");
-                });
+				// endpoints.MapGet("/", async context =>
+				// {
+				//     context.Response.Redirect("/Books");
+				// });
 				//redirection ends
 				endpoints.MapControllerRoute("default", "{controller=Books}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
-            });
-        }
-    }
+				endpoints.MapRazorPages();
+			});
+		}
+	}
 }

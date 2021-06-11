@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Phrook.Models.Services.Application;
 using Phrook.Models.ViewModels;
@@ -14,9 +15,9 @@ namespace Phrook.Controllers
         }
 
 		// /Books
-        public IActionResult Index() 
+        public async Task<IActionResult> Index() 
 		{
-			List<BookViewModel>  books = bookService.GetBooks();
+			List<BookViewModel>  books = await bookService.GetBooksAsync();
 
 			//return the view /views/Books/Index
 			ViewData["Title"] = "Library";
@@ -24,17 +25,18 @@ namespace Phrook.Controllers
 		}
 
 		// /Books/Detail/?isbn
-		public IActionResult Detail(int id) 
+		public async Task<IActionResult> Detail(int id) 
 		{
-			BookDetailViewModel  book = bookService.GetBook(id);
+			BookDetailViewModel  book = await bookService.GetBookAsync(id);
 			//return the view /views/Books/Index
 			string title;
-			if(book.Title.Length > 5) {
-				title = string.Concat($"{book.Title.Substring(0, 5)}", "...");
+			const int maxChar = 12;
+			if(book.Title.Length > maxChar) {
+				title = string.Concat($"{book.Title.Substring(0, maxChar)}", "...");
 			}
 			else
 			{
-				title = book.Title.Substring(0, 5);
+				title = book.Title.Substring(0, maxChar);
 			}
 
 			ViewData["Title"] = title;
