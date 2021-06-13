@@ -20,7 +20,7 @@ namespace Phrook.Controllers
 			List<BookViewModel>  books = await bookService.GetBooksAsync();
 
 			//return the view /views/Books/Index
-			ViewData["Title"] = "Library";
+			ViewData["Title"] = "Libreria";
 			return View(books);
 		}
 
