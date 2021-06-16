@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Phrook.Models.InputModels;
 using Phrook.Models.Services.Application;
 using Phrook.Models.ViewModels;
 
@@ -15,17 +16,23 @@ namespace Phrook.Controllers
         }
 
 		// /Books
-        public async Task<IActionResult> Index() 
+        public async Task<IActionResult> Index(BookListInputModel input) 
 		{
-			List<BookViewModel>  books = await bookService.GetBooksAsync();
+			ListViewModel<BookViewModel> books = await bookService.GetBooksAsync(input);
+
+			var viewModel = new BookListViewModel
+			{
+				Books = books,
+				Input = input
+			};
 
 			//return the view /views/Books/Index
 			ViewData["Title"] = "Libreria";
-			return View(books);
+			return View(viewModel);
 		}
 
 		// /Books/Detail/?isbn
-		public async Task<IActionResult> Detail(int id) 
+		public async Task<IActionResult> Detail([FromRoute]int id) 
 		{
 			BookDetailViewModel  book = await bookService.GetBookAsync(id);
 			//return the view /views/Books/Index

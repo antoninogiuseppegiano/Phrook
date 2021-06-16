@@ -44,7 +44,10 @@ namespace Phrook
 			});
 
 			#region OPTIONS
-			// services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
+			services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
+			services.Configure<BooksOptions>(Configuration.GetSection("Books"));
+			services.Configure<BooksOrderOptions>(Configuration.GetSection("Books:Order"));
+
 			#endregion
 		}
 
@@ -64,12 +67,11 @@ namespace Phrook
 			}
 			else
 			{
-				//TODO: levare commento per gestione errori
-				/* app.UseExceptionHandler(new ExceptionHandlerOptions
+				app.UseExceptionHandler(new ExceptionHandlerOptions
                 {
                     ExceptionHandlingPath = "/Error",
                     AllowStatusCode404Response = true
-                }); */
+                });
 			}
 
 			app.UseHttpsRedirection();
@@ -83,7 +85,7 @@ namespace Phrook
 				// redirection starts
 				// endpoints.MapGet("/", async context =>
 				// {
-				//     context.Response.Redirect("/Books");
+				//     context.Response.Redirect("/Books/Index");
 				// });
 				//redirection ends
 				endpoints.MapControllerRoute("default", "{controller=Books}/{action=Index}/{id?}");

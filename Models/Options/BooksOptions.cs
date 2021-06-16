@@ -3,7 +3,7 @@ namespace Phrook.Models.Options
     public class BooksOptions
     {
 	
-		public long PerPage { get; set; }
+		public int PerPage { get; set; }
 		public BooksOrderOptions Order { get; set; }
 	}
 
