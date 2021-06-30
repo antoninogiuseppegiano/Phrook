@@ -1,0 +1,70 @@
+@model SearchBookListViewModel
+<h1>Risultati della ricerca</h1>
+
+@{
+	var booksList = Model.Books;
+	var books = booksList.Results;
+	var input = Model.Input;
+}
+
+@if(booksList.TotalCount > 0) {
+	@foreach (SearchedBookViewModel book in books)
+	{
+		<hr>
+		<div class="row book-library search">
+			<div class="col-md-1">
+				<img src="@book.ImagePath" width="52" height="52">
+			</div>
+			<div class="col-md-4">
+				<h2>@book.Title</h2>
+				<author>@book.Author</author>
+			</div>
+			<div class="col-md-1 d-flex align-items-center">
+				@book.ISBN
+			</div>
+			<div class="col-md-2 d-flex align-items-center">
+				<a class="btn btn-outline-primary" asp-action="AddToLibrary" asp-route-id="@book.Id">Aggiungi alla libreria</a>  
+			</div>
+			<div class="col-md-2 d-flex align-items-center">
+				<a class="btn btn-outline-primary" asp-action="Overview" asp-route-id="@book.Id">Panoramica</a>  
+			</div>
+		</div>
+	}
+}
+@* TODO: se lungo 0 allora messaggio no libri *@
+
+@{
+	int totalPages = (int)Math.Ceiling(booksList.TotalCount / (decimal)input.Limit);
+	int currentPage = input.Page;
+}
+<nav aria-label="Paginazione">
+	<ul class="pagination d-flex justify-content-center mt-3">
+		@if(currentPage > 1) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-controller="Books" asp-action="Search" asp-route-page="@(currentPage - 1)" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fa-angle-left"></i></a>
+			</li>
+		}
+		@for(int p = Math.Max(1, currentPage - 4); p <= Math.Min(totalPages, currentPage + 4); p++) 
+		{
+			if(p == currentPage) 
+			{
+				<li class="page-item active" aria-current="page">
+					<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@p" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p <span class="sr-only">(current)</span></a>
+				</li>
+			}
+			else 
+			{
+				<li class="page-item">
+					<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@p" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p</a>
+				</li>
+			}
+		}
+		@if(currentPage < totalPages) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fas fa-angle-right"></i></a>
+			</li>
+		}
+	</ul>
+</nav>

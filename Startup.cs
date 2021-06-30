@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Phrook.Models.Options;
 using Phrook.Models.Services.Application;
+using Phrook.Models.Services.HttpClients;
 using Phrook.Models.Services.Infrastructure;
 
 namespace Phrook
@@ -35,6 +36,7 @@ namespace Phrook
 			services.AddRazorPages();
 			services.AddMvc();
 			services.AddTransient<IBookService, EfCoreBookService>();
+			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
 			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>
 			{
 				// string connectionString = Configuration.GetSection("ConnectionStrings").GetValue<string>("Default");
@@ -47,7 +49,7 @@ namespace Phrook
 			services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
 			services.Configure<BooksOptions>(Configuration.GetSection("Books"));
 			services.Configure<BooksOrderOptions>(Configuration.GetSection("Books:Order"));
-
+			services.Configure<GoogleBooksApiOptions>(Configuration.GetSection("GoogleBooksApi"));
 			#endregion
 		}
 

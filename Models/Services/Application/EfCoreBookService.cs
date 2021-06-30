@@ -28,7 +28,7 @@ namespace Phrook.Models.Services.Application
 			this.dbContext = dbContext;
 		}
 
-		public async Task<BookDetailViewModel> GetBookAsync(int id)
+		public async Task<BookDetailViewModel> GetBookByIdAsync(string id)
 		{
 			logger.LogInformation("Book id: {id} requested.", id);
 			BookDetailViewModel book;
@@ -58,7 +58,7 @@ namespace Phrook.Models.Services.Application
 
 			return book;
 		}
-
+		
 		public async Task<ListViewModel<BookViewModel>> GetBooksAsync(BookListInputModel model)
 		{
 			logger.LogInformation("Book list requested.");
@@ -117,6 +117,38 @@ namespace Phrook.Models.Services.Application
 				TotalCount = totalCount
 			};
 			return result;
+		}
+
+		
+		public async Task<BookDetailViewModel> GetBookByISBNAsync(string ISBN)
+		{
+			logger.LogInformation("Book id: {ISBN} requested.", ISBN);
+			BookDetailViewModel book;
+			try {
+				book = await dbContext.Books
+				.AsNoTracking()
+				.Where(book => book.Isbn.Equals(ISBN))
+				.Select(book =>
+				new BookDetailViewModel
+				{
+					Id = book.Id,
+					ISBN = book.Isbn,
+					Title = book.Title,
+					Author = book.Author,
+					ImagePath = book.ImagePath,
+					Rating = book.Rating,
+					Tag = book.Tag,
+					ReadingState = book.ReadingState,
+					Description = book.Description
+				})
+				.SingleAsync();
+			}
+			catch (InvalidOperationException) {
+				logger.LogWarning("Book {ISBN} not found", ISBN);
+				throw new BookNotFoundException(ISBN);
+			}
+
+			return book;
 		}
 	}
 }

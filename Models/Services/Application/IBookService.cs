@@ -8,6 +8,7 @@ namespace Phrook.Models.Services.Application
     public interface IBookService
     {
         Task<ListViewModel<BookViewModel>> GetBooksAsync(BookListInputModel model);
-        Task<BookDetailViewModel> GetBookAsync(int id);
+        Task<BookDetailViewModel> GetBookByIdAsync(string id);
+		Task<BookDetailViewModel> GetBookByISBNAsync(string ISBN);
 	}
 }
