@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
  
 namespace Phrook.Models.ResponseModels
 {
-    public partial class GoogleBooksApiResponseModel
+    public partial class GoogleBooksApiByParametersResponseModel
 	{
 		// [JsonPropertyName("kind")]
 		// public string Kind { get; set; }

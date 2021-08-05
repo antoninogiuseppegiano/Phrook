@@ -4,7 +4,7 @@ namespace Phrook.Models.Util
     {
         public static string _getShortTitle (string title){
 			string newTitle;
-			const int maxChar = 12;
+			const int maxChar = 20;
 			if (title.Length > maxChar)
 			{
 				newTitle = string.Concat($"{title.Substring(0, maxChar)}", "...");
