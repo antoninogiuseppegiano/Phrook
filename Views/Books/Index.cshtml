@@ -18,11 +18,11 @@
 
 <div class="row d-flex align-items-center">
 	<div class="col-md-1"></div>
-	<div class="col-md-2"><a asp-route-search="@Model.Input.Search" asp-route-orderby="Title" asp-route-ascending="@(Model.Input.OrderBy == "Title" ? !Model.Input.Ascending : true)">Titolo @if(Model.Input.OrderBy == "Title"){<i class="fas fa-caret-@(Model.Input.Ascending ? "up" :"down")"></i>}</a></div>
-	<div class="col-md-2"><a asp-route-search="@Model.Input.Search" asp-route-orderby="Author" asp-route-ascending="@(Model.Input.OrderBy == "Author" ? !Model.Input.Ascending : true)">Autore @if(Model.Input.OrderBy == "Author"){<i class="fas fa-caret-@(Model.Input.Ascending ? "up" :"down")"></i>}</a></div>
-	<div class="col-md-1"><a asp-route-search="@Model.Input.Search" asp-route-orderby="ReadingState" asp-route-ascending="@(Model.Input.OrderBy == "ReadingState" ? !Model.Input.Ascending : true)">Stato @if(Model.Input.OrderBy == "ReadingState"){<i class="fas fa-caret-@(Model.Input.Ascending ? "up" :"down")"></i>}</a></div>
-	<div class="col-md-2"><a asp-route-search="@Model.Input.Search" asp-route-orderby="Rating" asp-route-ascending="@(Model.Input.OrderBy == "Rating" ? !Model.Input.Ascending : true)">Valutazione @if(Model.Input.OrderBy == "Rating"){<i class="fas fa-caret-@(Model.Input.Ascending ? "up" :"down")"></i>}</a></div>
-	<div class="col-md-2"><a asp-route-search="@Model.Input.Search" asp-route-orderby="Tag" asp-route-ascending="@(Model.Input.OrderBy == "Tag" ? !Model.Input.Ascending : true)">Tag @if(Model.Input.OrderBy == "Tag"){<i class="fas fa-caret-@(Model.Input.Ascending ? "up" :"down")"></i>}</a></div>
+	<div class="col-md-2"><order-link order-by="Title" Input="@Model.Input">Titolo</order-link></div>
+	<div class="col-md-2"><order-link order-by="Author" Input="@Model.Input">Autore</order-link></div>
+	<div class="col-md-1"><order-link order-by="ReadingState" Input="@Model.Input">Stato</order-link></div>
+	<div class="col-md-2"><order-link order-by="Rating" Input="@Model.Input">Valutazione</order-link></div>
+	<div class="col-md-2"><order-link order-by="Tag" Input="@Model.Input">Tag</order-link></div>
 	<div class="col-md-2"></div>
 </div>
 
@@ -41,21 +41,7 @@
         @book.ReadingState
     </div>
     <div class="col-md-2 d-flex align-items-center rating" title="@book.Rating">
-		@for(int i = 1; i <= 5; i++) 
-		{
-			if(book.Rating >= i) 
-			{
-				<i class="fas fa-star"></i>
-			}
-			else if (book.Rating > i -1 ) 
-			{
-				<i class="fas fa-star-half-alt"></i>
-			}
-			else 
-			{
-				<i class="far fa-star"></i>
-			}
-		}
+		<rating value="@book.Rating"></rating>
 		
     </div>
     <div class="col-md-2 d-flex align-items-center">

@@ -33,9 +33,10 @@ namespace Phrook.Models.Services.Application
 			logger.LogInformation("Book id: {id} requested.", id);
 			BookDetailViewModel book;
 			try {
-				book = await dbContext.Books
+				int.TryParse(id, out int intId);
+				var query = dbContext.Books
 				.AsNoTracking()
-				.Where(book => book.Id.Equals(id))
+				.Where(book => book.Id == intId)
 				.Select(book =>
 				new BookDetailViewModel
 				{
@@ -48,8 +49,8 @@ namespace Phrook.Models.Services.Application
 					Tag = book.Tag,
 					ReadingState = book.ReadingState,
 					Description = book.Description
-				})
-				.SingleAsync();
+				});
+				book = await query.SingleAsync();
 			}
 			catch (InvalidOperationException) {
 				logger.LogWarning("Book {id} not found", id);

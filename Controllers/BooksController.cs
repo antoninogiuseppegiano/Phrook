@@ -82,31 +82,36 @@ namespace Phrook.Controllers
 			return View(viewModel);
 		}
 		
-		public async Task<IActionResult> OverviewByISBN(string ISBN)
+		public async Task<IActionResult> OverviewByISBN(string searchISBN)
 		{
-			if (string.IsNullOrEmpty(ISBN))
+			if (string.IsNullOrEmpty(searchISBN))
 			{
-				throw new InvalidApiInputException(ISBN);
+				throw new InvalidApiInputException(searchISBN);
 			}
 
 			//TODO: chiamare servizio che cerca tra i libri in db
-			BookDetailViewModel book = await _bookService.GetBookByISBNAsync(ISBN);
-
-			//TODO: se non mi torna niente
-			if( book != null)
+			try
 			{
-				string bookId = await _gbClient.GetIdFromISBNAsync(ISBN);
-				BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(bookId);
-				var viewModel =  new SearchBookViewModel {
-					Book = overviewViewModel,
-					Search = ISBN
-				};
-				ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
-				return View("Overview", viewModel);
-			}
+				BookDetailViewModel book = await _bookService.GetBookByISBNAsync(searchISBN);
 
-			ViewData["Title"] = Utility._getShortTitle(book.Title);
-			return View("Detail", book);
+				//TODO: se non appartiene all'utente
+				bool memberHasBook = false;
+				if( memberHasBook)
+				{
+					ViewData["Title"] = Utility._getShortTitle(book.Title);
+					return View("Detail", book);
+				}
+			} catch (BookNotFoundException e) {}
+
+			string bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
+			BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(bookId);
+			var viewModel =  new SearchBookViewModel {
+				Book = overviewViewModel,
+				Search = searchISBN
+			};
+			ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
+			return View("Overview", viewModel);
+			
 		}
 
 		public async Task<IActionResult> OverviewById([FromQuery] string id)
@@ -117,22 +122,28 @@ namespace Phrook.Controllers
 			}
 
 			//TODO: chiamare servizio che cerca tra i libri in db
-			BookDetailViewModel book = await _bookService.GetBookByIdAsync(id);
-
-			//TODO: se non mi torna niente
-			if( book != null)
+			try
 			{
-				BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(id);
-				var viewModel =  new SearchBookViewModel {
-					Book = overviewViewModel,
-					Search = id
-				};
-				ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
-				return View("Overview", viewModel);
-			}
+				BookDetailViewModel book = await _bookService.GetBookByIdAsync(id);
 
-			ViewData["Title"] = Utility._getShortTitle(book.Title);
-			return View("Detail", book);
+				//TODO: se non appartiene all'utente
+				bool memberHasBook = false;
+				if( memberHasBook)
+				{
+					ViewData["Title"] = Utility._getShortTitle(book.Title);
+					return View("Detail", book);
+				}
+			}
+			catch (BookNotFoundException e){}
+
+			BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(id);
+			var viewModel =  new SearchBookViewModel {
+				Book = overviewViewModel,
+				Search = id
+			};
+			ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
+			return View("Overview", viewModel);
+			
 		}
 	}
 }

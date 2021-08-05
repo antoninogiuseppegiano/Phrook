@@ -46,7 +46,6 @@ namespace Phrook.Models.Services.HttpClients
 				}
 			}
 		}
-
 		private string GetApiUrl(string title, string author)
 		{
 			string url = googleBooksApiOptions.CurrentValue.Url;
@@ -59,15 +58,16 @@ namespace Phrook.Models.Services.HttpClients
 			try
 			{
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(id, GoogleBooksApiType.Id));
-				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiResponseModel>(responseStream);
-				Item item = deserialized.Items.First();
+				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByIdResponseModel>(responseStream);
+
 				BookOverviewViewModel viewModel = new() {
-					Id = item.Id,
-					ISBN = item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Select(ii => ii.Identifier).SingleOrDefault(),
-					Title = item.VolumeInfo.Title,
-					Author = item.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next),
-					ImagePath = item.VolumeInfo.ImageLinks.Thumbnail.ToString(),
-					Description = item.VolumeInfo.Description
+					Id = deserialized.Id,
+					ISBN = deserialized.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Select(ii => ii.Identifier).SingleOrDefault(),
+					Title = deserialized.VolumeInfo.Title,
+					// Author = deserialized.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next),
+					Author = string.Join(" - ", deserialized.VolumeInfo.Authors),
+					ImagePath = deserialized.VolumeInfo.ImageLinks.Thumbnail.ToString(),
+					Description = deserialized.VolumeInfo.Description
 				};
 				return viewModel;
 			}
@@ -83,7 +83,7 @@ namespace Phrook.Models.Services.HttpClients
 			try
 			{
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(isbn, GoogleBooksApiType.ISBN));
-				var bookId = (await JsonSerializer.DeserializeAsync<GoogleBooksApiResponseModel>(responseStream)).Items.First().Id;
+				var bookId = (await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream)).Items.First().Id;
 				return bookId;
 			}
 			catch (Exception e)
@@ -98,7 +98,7 @@ namespace Phrook.Models.Services.HttpClients
 			try
 			{
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(title, author));
-				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiResponseModel>(responseStream);
+				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream);
 				ListViewModel<SearchedBookViewModel> viewModel = new() {Results = new()};
 				string isbn, image;
 				foreach (var Item in deserialized.Items)

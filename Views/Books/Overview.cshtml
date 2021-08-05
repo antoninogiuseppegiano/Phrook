@@ -1,0 +1,25 @@
+@model SearchBookViewModel
+@{
+	BookOverviewViewModel book = Model.Book;
+}
+<section class="book-detail mt-2">
+    <div class="row">
+		<div class="col-md-3">
+            <aside>
+				@* <a href="#" class="btn btn-warning btn-lg btn-block button-book">Button</a> *@
+                <img src="@book.ImagePath" class="img-fluid course-image" alt="@book.Title">
+			</aside>
+        </div>
+        <div class="col-md-9">
+			<div class="row">
+				<h1 class="mb-0">@book.Title</h1>
+				<span class="isbn">ISBN: @book.ISBN</span>
+				<author>di @book.Author</author>
+			</div>
+			<div class="row">
+				@* TODO: controllare description vuote *@
+				<p>@book.Description</p>
+			</div>
+        </div>
+    </div>
+</section>
