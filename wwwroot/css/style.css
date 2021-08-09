@@ -73,6 +73,25 @@ h2 {
     margin-bottom: 1em;
 }
 
+.field-validation-error {
+	color: red;
+}
+.validation-summary-errors ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 1em;
+}
+.validation-summary-errors li {
+	color: darkred;
+	border-left: 3px solid red;
+	padding-left: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	background-color: rgba(255, 0, 0, 0.05);
+	margin-bottom: 2px;
+}
+
 /* prese da altro progetto aggiornare nomi, buone per parte dinamica libro */
 /* .course-lessons .lesson-duration i, .course-lessons .course-duration i {
     margin-right: 0.3em;
