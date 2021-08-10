@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +80,14 @@ namespace Phrook
 
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
+
+			var appCulture = CultureInfo.InvariantCulture;
+			app.UseRequestLocalization(new RequestLocalizationOptions 
+			{
+				DefaultRequestCulture = new RequestCulture(appCulture),
+				SupportedCultures = new[] {appCulture}
+			});
+
 			app.UseRouting();
 			
 			// app.UseAuthorization();
