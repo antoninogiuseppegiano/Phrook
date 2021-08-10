@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-9">
 			<div class="row">
-				<h1 class="mb-0">@Model.Title</h1>
+				<h1 class="mb-0">@Model.Title <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a></h1>
 				<span class="isbn">ISBN: @Model.ISBN</span>
 				<author>di @Model.Author</author>
 			</div>

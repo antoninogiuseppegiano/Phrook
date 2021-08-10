@@ -82,6 +82,11 @@
 		</nav>
 	</header>
 	<div class="container">
+		@if(TempData["ConfirmationMessage"] != null) {
+			<div class="alert alert-success alert-dismissable mt-3" role="alert">
+				@TempData["ConfirmationMessage"]
+			</div>
+		}
 		@RenderBody()
 	</div>
 
@@ -105,6 +110,8 @@
 			integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
 			crossorigin="anonymous"></script>
 	</environment>
+	
+	@RenderSection("Scripts", false);
 </body>
 
 </html>

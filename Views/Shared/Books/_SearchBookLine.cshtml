@@ -1,0 +1,21 @@
+@model SearchedBookViewModel
+
+<hr>
+<div class="row book-library search">
+	<div class="col-md-1">
+		<img src="@Model.ImagePath" width="52" height="52">
+	</div>
+	<div class="col-md-4">
+		<h2>@Model.Title</h2>
+		<author>@Model.Author</author>
+	</div>
+	<div class="col-md-2 d-flex align-items-center">
+		@Model.ISBN
+	</div>
+	<div class="col-md-2 d-flex align-items-center">
+		<a class="btn btn-outline-primary" asp-action="AddToLibrary" asp-route-id="@Model.Id">Aggiungi alla libreria</a>  
+	</div>
+	<div class="col-md-2 d-flex align-items-center">
+		<a class="btn btn-outline-primary" asp-action="Overview" asp-route-id="@Model.Id">Panoramica</a>  
+	</div>
+</div>

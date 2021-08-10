@@ -28,64 +28,8 @@
 
 @foreach (BookViewModel book in Model.Books.Results)
 {
-<hr>
-<div class="row book-library">
-    <div class="col-md-1">
-        <img src="~/logo.svg" width="52" height="52">
-    </div>
-    <div class="col-md-4">
-        <h2>@book.Title</h2>
-        <author>@book.Author</author>
-    </div>
-	<div class="col-md-1 d-flex align-items-center">
-        @book.ReadingState
-    </div>
-    <div class="col-md-2 d-flex align-items-center rating" title="@book.Rating">
-		<rating value="@book.Rating"></rating>
-		
-    </div>
-    <div class="col-md-2 d-flex align-items-center">
-        @book.Tag
-    </div>
-    <div class="col-md-2 d-flex align-items-center">
-      <a class="btn btn-outline-primary" asp-action="Detail" asp-route-id="@book.Id">Dettaglio</a>  
-    </div>
-</div>
+	<partial name="Books/_BookLine" model="@book"></partial>
 }
 @* TODO: se lungo 0 allora messaggio no libri *@
 
-@{
-	int totalPages = (int)Math.Ceiling(Model.Books.TotalCount / (decimal)Model.Input.Limit);
-	int currentPage = Model.Input.Page;
-}
-<nav aria-label="Paginazione">
-	<ul class="pagination d-flex justify-content-center mt-3">
-		@if(currentPage > 1) 
-		{
-			<li class="page-item">
-				<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fa-angle-left"></i></a>
-			</li>
-		}
-		@for(int p = Math.Max(1, currentPage - 4); p <= Math.Min(totalPages, currentPage + 4); p++) 
-		{
-			if(p == currentPage) 
-			{
-				<li class="page-item active" aria-current="page">
-					<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending">@p <span class="sr-only">(current)</span></a>
-				</li>
-			}
-			else 
-			{
-				<li class="page-item">
-					<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending">@p</a>
-				</li>
-			}
-		}
-		@if(currentPage < totalPages) 
-		{
-			<li class="page-item">
-				<a class="page-link" asp-controller="Books" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fas fa-angle-right"></i></a>
-			</li>
-		}
-	</ul>
-</nav>
+<vc:pagination-bar model="@Model"></vc:pagination-bar>

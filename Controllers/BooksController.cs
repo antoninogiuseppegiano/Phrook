@@ -24,7 +24,6 @@ namespace Phrook.Controllers
 			this._bookService = bookService;
 		}
 
-		// /Books
 		public async Task<IActionResult> Index(BookListInputModel input)
 		{
 			ListViewModel<BookViewModel> books = await _bookService.GetBooksAsync(input);
@@ -40,7 +39,6 @@ namespace Phrook.Controllers
 			return View(viewModel);
 		}
 
-		// /Books/Detail/?isbn
 		public async Task<IActionResult> Detail([FromRoute] string id)
 		{
 			BookDetailViewModel book;
@@ -49,6 +47,37 @@ namespace Phrook.Controllers
 			//return the view /views/Books/Index
 			ViewData["Title"] = Utility._getShortTitle(book.Title);
 			return View(book);
+		}
+
+		public async Task<IActionResult> Edit([FromRoute] string id) 
+		{
+			EditBookInputModel inputModel = await _bookService.GetBookForEditingAsync(id);
+			//TODO ricarica pagina
+			ViewData["Title"] = "Modifica libro";
+			return View(inputModel);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit(EditBookInputModel inputModel) 
+		{
+			if(!ModelState.IsValid)
+			{
+				try
+				{
+					BookDetailViewModel book = await _bookService.EditBookAsync(inputModel);
+					TempData["ConfirmationMessage"] = "Campi aggiornati correttamente.";
+					return RedirectToAction(nameof(Detail), new { id = inputModel.Id });
+				}
+				catch (System.Exception)
+				{
+					
+					throw;
+				}
+			}
+
+			//TODO ricarica pagina
+			ViewData["Title"] = "Modifica libro";
+			return View(inputModel);
 		}
 
 		public async Task<IActionResult> Search(SearchApiInputModel input)
@@ -63,7 +92,15 @@ namespace Phrook.Controllers
 			//TODO: chiamare servizio che cerca tra i libri posseduti dall'utente in db  ????
 			//books = await _bookService.GetBooksByTitleAuthorAsync(input);
 
-			books = await _gbClient.GetBooksByTitleAuthorAsync(input.SearchTitle, input.SearchAuthor);
+			try
+			{
+				books = await _gbClient.GetBooksByTitleAuthorAsync(input.SearchTitle, input.SearchAuthor);
+			}
+			catch(ApiException) 
+			{
+				books = new() {Results = new()};;
+			}
+
 			//TODO: mettere insieme i risultati delle due chiamate (prendere id unici)
 
 			List<SearchedBookViewModel> paginated = new();
@@ -84,34 +121,45 @@ namespace Phrook.Controllers
 		
 		public async Task<IActionResult> OverviewByISBN(string searchISBN)
 		{
-			if (string.IsNullOrEmpty(searchISBN))
+			if (string.IsNullOrEmpty(searchISBN) || !long.TryParse(searchISBN, out _))
 			{
 				throw new InvalidApiInputException(searchISBN);
 			}
 
-			//TODO: chiamare servizio che cerca tra i libri in db
+			//TODO: se non appartiene all'utente
+			BookDetailViewModel book;
 			try
 			{
-				BookDetailViewModel book = await _bookService.GetBookByISBNAsync(searchISBN);
+				book = await _bookService.GetBookByISBNAsync(searchISBN);
+			} 
+			catch
+			{
+				book = null;
+			}
 
-				//TODO: se non appartiene all'utente
-				bool memberHasBook = false;
-				if( memberHasBook)
-				{
-					ViewData["Title"] = Utility._getShortTitle(book.Title);
-					return View("Detail", book);
-				}
-			} catch (BookNotFoundException e) {}
-
+			if(book is not null)
+			{
+				ViewData["Title"] = Utility._getShortTitle(book.Title);
+				return View("Detail", book);
+			}
+			
 			string bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
-			BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(bookId);
+			BookOverviewViewModel overviewViewModel;
+			
+			try {
+				overviewViewModel = await _gbClient.GetBookByIdAsync(bookId);
+			} 
+			catch(ApiException) 
+			{
+				overviewViewModel = null;
+			}
+
 			var viewModel =  new SearchBookViewModel {
 				Book = overviewViewModel,
 				Search = searchISBN
 			};
 			ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
 			return View("Overview", viewModel);
-			
 		}
 
 		public async Task<IActionResult> OverviewById([FromQuery] string id)
@@ -121,28 +169,45 @@ namespace Phrook.Controllers
 				throw new InvalidApiInputException(id);
 			}
 
-			//TODO: chiamare servizio che cerca tra i libri in db
+			//TODO: se appartiene all'utente
+			BookDetailViewModel book;
 			try
 			{
-				BookDetailViewModel book = await _bookService.GetBookByIdAsync(id);
-
-				//TODO: se non appartiene all'utente
-				bool memberHasBook = false;
-				if( memberHasBook)
-				{
-					ViewData["Title"] = Utility._getShortTitle(book.Title);
-					return View("Detail", book);
-				}
+				book = await _bookService.GetBookByIdAsync(id);
 			}
-			catch (BookNotFoundException e){}
+			catch (BookNotFoundException){ book = null; }
 
-			BookOverviewViewModel overviewViewModel = await _gbClient.GetBookByIdAsync(id);
-			var viewModel =  new SearchBookViewModel {
-				Book = overviewViewModel,
-				Search = id
-			};
-			ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
-			return View("Overview", viewModel);
+			if(book is not null) 
+			{
+				ViewData["Title"] = Utility._getShortTitle(book.Title);
+				return View("Detail", book);
+			}
+			
+			BookOverviewViewModel overviewViewModel;
+			try 
+			{
+				overviewViewModel = await _gbClient.GetBookByIdAsync(id);
+			}
+			catch(ApiException) 
+			{
+				throw new BookNotFoundException(int.Parse(id));
+			}
+
+			if(overviewViewModel is not null) 
+			{
+				var viewModel = new SearchBookViewModel
+				{
+					Book = overviewViewModel,
+					Search = id
+				};
+				ViewData["Title"] = Utility._getShortTitle(overviewViewModel.Title);
+				return View("Overview", viewModel);
+			}
+			else
+			{
+				throw new BookNotFoundException(int.Parse(id));
+			}
+			
 			
 		}
 	}

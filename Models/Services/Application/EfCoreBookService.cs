@@ -145,11 +145,72 @@ namespace Phrook.Models.Services.Application
 				.SingleAsync();
 			}
 			catch (InvalidOperationException) {
-				logger.LogWarning("Book {ISBN} not found", ISBN);
+				logger.LogWarning("Book {ISBN} not found in local database.", ISBN);
 				throw new BookNotFoundException(ISBN);
 			}
 
 			return book;
+		}
+		
+		public async Task<BookDetailViewModel> EditBookAsync(EditBookInputModel inputModel) 
+		{
+			Book book = await dbContext.Books.FindAsync(inputModel.Id);
+
+			book.ChangeRating(inputModel.Rating);
+			book.ChangeTag(inputModel.Tag);
+			book.ChangeReadingState(inputModel.ReadingState);
+			
+			try
+			{
+				await dbContext.SaveChangesAsync();
+			}
+			catch (DbUpdateException e)
+			{
+				throw e; //it doesn't make sense, just for structural reasons
+			}
+
+			return new BookDetailViewModel {
+                Id = book.Id,
+				ISBN = book.Isbn,
+                Title = book.Title,
+                Description = book.Description,
+                Author = book.Author,
+                ImagePath = book.ImagePath,
+                Rating = book.Rating,
+				Tag = book.Tag,
+				ReadingState = book.ReadingState
+            };
+
+		}
+
+		public async  Task<EditBookInputModel> GetBookForEditingAsync(string id)
+		{
+			IQueryable<EditBookInputModel> query;
+			try{
+				int.TryParse(id, out int intId);
+				query = dbContext.Books
+				.AsNoTracking()
+				//TODO: implementare fuzzy
+				.Where(book => book.Id == intId)
+				.Select(book =>
+				new EditBookInputModel
+				{
+					Id = book.Id,
+					Title = book.Title,
+
+					Rating = book.Rating,
+					Tag = book.Tag,
+					ReadingState = book.ReadingState
+				});
+
+				EditBookInputModel book = await query.SingleAsync();
+				return book;
+			}
+			catch (InvalidOperationException)
+			{
+				int.TryParse(id, out int intId);
+				throw new BookNotFoundException(intId);
+			}
 		}
 	}
 }

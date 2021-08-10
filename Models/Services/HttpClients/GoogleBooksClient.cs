@@ -100,22 +100,34 @@ namespace Phrook.Models.Services.HttpClients
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(title, author));
 				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream);
 				ListViewModel<SearchedBookViewModel> viewModel = new() {Results = new()};
-				string isbn, image;
+				string isbn, image, authors;
+				if(deserialized.Items == null)
+				{
+					return viewModel;
+				}
 				foreach (var Item in deserialized.Items)
 				{
-					if(Item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Any()){
+					if(Item.VolumeInfo.IndustryIdentifiers != null && Item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Any()){
 						isbn = Item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Select(ii => ii.Identifier).SingleOrDefault();
 					}
 					else continue;
 
 					image = Item.VolumeInfo.ImageLinks == null ? "#" : Item.VolumeInfo.ImageLinks.Thumbnail.ToString();
+					if(Item.VolumeInfo.Authors != null && Item.VolumeInfo.Authors.Any()) 
+					{
+						authors = Item.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next).Substring(3);
+					}
+					else
+					{
+						authors = "Sconosciuto";
+					}
 
 					viewModel.Results.Add(
 						new SearchedBookViewModel {
 							Id = Item.Id,
 							ISBN = isbn,
 							Title = Item.VolumeInfo.Title,
-							Author = Item.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next).Substring(3),
+							Author = authors,
 							ImagePath = image
 						}
 					);

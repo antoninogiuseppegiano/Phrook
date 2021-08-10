@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Phrook.Models.Enums;
+using Phrook.Models;
 
 #nullable disable
 
@@ -19,6 +21,7 @@ namespace Phrook.Models.Entities
             }   
             Title = title;
             Author = author;
+			ImagePath = "/Books/default.png";
         }
 
         public int Id { get; private set; }
@@ -33,13 +36,36 @@ namespace Phrook.Models.Entities
 
 		// ICollection<Review> Reviews { get; set; }
 
-		public void ChangeTitle(string newTitle)
+		public void ChangeRating(double newRating)
         {
-            if (string.IsNullOrWhiteSpace(newTitle))
+            if (newRating < 1 || newRating > 5)
             {
-                throw new ArgumentException("The course must have a title");
+                throw new ArgumentException("The rating must be between 1 and 5.");
             }
-            Title = newTitle;
+            Rating = newRating;
+        }
+
+		public void ChangeTag(string s_newTagIndex)
+        {
+			int.TryParse(s_newTagIndex, out int newTagIndex);
+            // if (!Enum.IsDefined(typeof(Tag), newTag))
+			if(newTagIndex <= 0 && Enum.GetValues<Tag>().Length <= newTagIndex)
+            {
+            	throw new ArgumentException("This tag value isn't valid.");
+            }
+			Tag newTag = (Tag)newTagIndex;
+            Tag = newTag.ToString();
+        }
+
+		public void ChangeReadingState(string s_newReadingStateIndex)
+        {
+			int.TryParse(s_newReadingStateIndex, out int newReadingStateIndex);
+
+            // if (!Enum.IsDefined(typeof(ReadingState), newReadingState))
+            // {
+            //     throw new ArgumentException("This reading state value isn't valid.");
+            // }
+            ReadingState = ((ReadingState)newReadingStateIndex).ToString();
         }
     }
 }
