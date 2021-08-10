@@ -24,6 +24,7 @@ namespace Phrook.Models.InputModels
 
 		[Display(Name = "Stato")]
 		public string ReadingState { get; set; }
+		public string RowVersion { get; set; }
 
 		public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 		{

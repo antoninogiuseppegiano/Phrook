@@ -68,10 +68,15 @@ namespace Phrook.Controllers
 					TempData["ConfirmationMessage"] = "Campi aggiornati correttamente.";
 					return RedirectToAction(nameof(Detail), new { id = inputModel.Id });
 				}
-				catch (System.Exception)
+				catch (OptimisticConcurrencyException)
 				{
-					
-					throw;
+					ModelState.Clear();
+					ModelState.AddModelError("", "Salvataggio interrotto. Le informazioni non sono più aggiornate. Aggiorna la pagina manualmente.");
+				}
+				catch
+				{
+					ModelState.Clear();
+					ModelState.AddModelError("", "Errore nel salvataggio.");
 				}
 			}
 

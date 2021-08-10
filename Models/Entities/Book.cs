@@ -33,6 +33,7 @@ namespace Phrook.Models.Entities
         public double Rating { get; private set; }
         public string Tag { get; private set; }
         public string ReadingState { get; private set; }
+        public string RowVersion { get; private set; }
 
 		// ICollection<Review> Reviews { get; set; }
 

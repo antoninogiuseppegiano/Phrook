@@ -22,6 +22,8 @@ namespace Phrook.Models.Services.Infrastructure
             {
 				entity.ToTable("Books");
 				entity.HasKey(book => book.Id); //unnecessary
+				entity.Property(book => book.RowVersion).IsRowVersion();
+
 				//TODO: togliere commento quando si aggiunge tabella per recensioni
 				/* entity.HasMany(course => course.Reviews)
 				.WithOne(review => review.Book)

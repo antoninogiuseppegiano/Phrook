@@ -159,10 +159,16 @@ namespace Phrook.Models.Services.Application
 			book.ChangeRating(inputModel.Rating);
 			book.ChangeTag(inputModel.Tag);
 			book.ChangeReadingState(inputModel.ReadingState);
+
+			dbContext.Entry(book).Property(book => book.RowVersion).OriginalValue = inputModel.RowVersion;
 			
 			try
 			{
 				await dbContext.SaveChangesAsync();
+			}
+			catch (DbUpdateConcurrencyException e)
+			{
+				throw new OptimisticConcurrencyException();
 			}
 			catch (DbUpdateException e)
 			{
@@ -200,7 +206,8 @@ namespace Phrook.Models.Services.Application
 
 					Rating = book.Rating,
 					Tag = book.Tag,
-					ReadingState = book.ReadingState
+					ReadingState = book.ReadingState,
+					RowVersion = book.RowVersion
 				});
 
 				EditBookInputModel book = await query.SingleAsync();
