@@ -171,10 +171,10 @@ namespace Phrook.Models.Services.Application
 			{
 				throw new OptimisticConcurrencyException();
 			}
-			catch (DbUpdateException e)
-			{
-				throw e; //it doesn't make sense, just for structural reasons
-			}
+			// catch (DbUpdateException e)
+			// {
+			// 	throw e; //it doesn't make sense, just for structural reasons
+			// }
 
 			return new BookDetailViewModel {
                 Id = book.Id,
