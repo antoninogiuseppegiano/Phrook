@@ -1,8 +1,27 @@
-<ul class="navbar-nav me-3">
-	<li class="nav-item me-auto">
-		<a class="nav-link active" asp-page="/Account/Register" asp-area="Identity">Registrati</a>
+@inject SignInManager<IdentityUser> signInManager
+
+@* says if is authenticated via Identity, instead of User.Identity.IsAuthenticated that says only if auth *@
+@if(signInManager.IsSignedIn(User)) 
+{
+<ul class="navbar-nav me-3 active">
+	<li class="nav-item">
+		<a class="nav-link" asp-page="/Account/Manage/Index" asp-area="Identity">Ciao @User.Identity.Name!</a>
 	</li>
-	<li class="nav-item me-auto">
-		<a class="nav-link active" asp-page="/Account/Login" asp-area="Identity">Login</a>
+	<li class="nav-item active">
+		<form class="form-inline" method="post" asp-page="/Account/Logout" asp-area="Identity">
+			<button type="submit" class="btn btn-link text-white">Esci</button>
+		</form>
 	</li>
 </ul>
+}
+else
+{
+<ul class="navbar-nav me-3 active">
+	<li class="nav-item">
+		<a class="nav-link" asp-page="/Account/Register" asp-area="Identity">Registrati</a>
+	</li>
+	<li class="nav-item active">
+		<a class="nav-link" asp-page="/Account/Login" asp-area="Identity">Login</a>
+	</li>
+</ul>
+}
