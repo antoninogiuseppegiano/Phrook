@@ -1,0 +1,37 @@
+<div id="navbar" class="collapse navbar-collapse">
+	<ul class="navbar-nav me-auto">
+		@* TODO: (forse) Implementare classe active *@
+		<li class="nav-item ms-auto">
+			<a class="nav-link active" asp-action="Index" asp-controller="Books">Libreria</a>
+		</li>
+		@* TODO: implementare ricerca *@
+		<li class="nav-item ms-3">
+			<div class="d-flex align-items-center">
+				<form asp-controller="Books" asp-action="Search" method="get">
+					<div class="input-group">
+						<input type="text" name="searchTitle" class="form-control" placeholder="Cerca titolo" @* value="" @Model.Input.Search *@>
+						<div class="input-group-append">
+							<input type="text" name="searchAuthor" class="form-control" placeholder="Cerca autore" @* value="" @Model.Input.Search *@>
+						</div>
+						<div class="input-group-append">
+							<button><i class="input-group-text fas fa-search"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</li>
+		<li class="nav-item ms-3">
+			<div class="d-flex align-items-center">
+				<form asp-controller="Books" asp-action="OverviewByISBN" method="get">
+					<div class="input-group">
+						<input type="text" name="searchISBN" class="form-control" placeholder="Cerca ISBN" value=""@* @Model.Input.Search *@>
+						<div class="input-group-append">
+							<button><i class="input-group-text fas fa-search"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</li>
+	</ul>
+	<partial name="_LoginPartial"></partial>
+</div>
