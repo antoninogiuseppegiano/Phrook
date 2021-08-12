@@ -9,7 +9,7 @@
 			</div>
 			<div class="col-md-3 d-flex align-items-center">
 				<button type="submit" class="btn btn-primary btn-lg btn-block">Salva</button>
-                <button type="button" class="btn btn-danger btn-lg ml-3"><i class="fas fa-trash-alt"></i></button>
+				<button class="btn btn-danger btn-lg ms-3" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="fas fa-trash-alt"></i></button>
 			</div>
 		</div>
 		<div class="row">
@@ -44,6 +44,26 @@
                 </aside>
             </div>
         </div>
+	</form>
+	<form method="post" asp-action="Delete" aspr-route-id="@Model.Id">
+		<div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-title" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="delete-modal-title">Conferma eliminazione</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Stai per rimuovere il libro dalla libreria. Confermi?</p>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+					<button type="submit" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Conferma</button>
+				</div>
+				</div>
+			</div>
+		</div>
+
 	</form>
 </section>
 

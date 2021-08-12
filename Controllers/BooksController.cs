@@ -215,5 +215,20 @@ namespace Phrook.Controllers
 			
 			
 		}
+	
+		public async Task<IActionResult> Delete(string id)
+		{
+			try
+			{
+				await _bookService.RemoveBookFromLibrary(id);
+			}
+			catch (BookNotFoundException)
+			{
+				TempData["ErrorMessage"] = "Non è stato possibile rimuovere il libro dalla libreria.";
+				return RedirectToAction(nameof(Index));
+			}
+			TempData["ConfirmationMessage"] = "Libro rimosso dalla libreria.";
+			return RedirectToAction(nameof(Index));
+		}
 	}
 }

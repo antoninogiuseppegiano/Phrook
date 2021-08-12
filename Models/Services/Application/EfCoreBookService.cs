@@ -11,6 +11,7 @@ using Phrook.Models.InputModels;
 using Phrook.Models.Options;
 using Phrook.Models.Services.Infrastructure;
 using Phrook.Models.ViewModels;
+using Z.EntityFramework.Plus;
 
 namespace Phrook.Models.Services.Application
 {
@@ -166,7 +167,7 @@ namespace Phrook.Models.Services.Application
 			{
 				await dbContext.SaveChangesAsync();
 			}
-			catch (DbUpdateConcurrencyException e)
+			catch (DbUpdateConcurrencyException)
 			{
 				throw new OptimisticConcurrencyException();
 			}
@@ -189,7 +190,7 @@ namespace Phrook.Models.Services.Application
 
 		}
 
-		public async  Task<EditBookInputModel> GetBookForEditingAsync(string id)
+		public async Task<EditBookInputModel> GetBookForEditingAsync(string id)
 		{
 			IQueryable<EditBookInputModel> query;
 			try{
@@ -218,6 +219,34 @@ namespace Phrook.Models.Services.Application
 				int.TryParse(id, out int intId);
 				throw new BookNotFoundException(intId);
 			}
+		}
+
+		public async Task RemoveBookFromLibrary(string id)
+		{
+			
+			Book book = await dbContext.Books.FindAsync(id);
+			if(book is null) 
+			{
+				throw new BookNotFoundException();
+			}
+			//TODO: ritrovare utente e rimuovere il libero dalla sua libreria (creare exception per eventuali errori?)
+
+			//TODO: Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
+				// Molto oneroso
+				// Book book = await dbContext.Books.FindAsync(id);
+				// dbContext.Remove(book);
+			// eliminazione dal db con EF Core PLUS
+			// if(int.TryParse(id, out int intId))
+			// {
+			// 	await dbContext.Books.Where(book => book.Id == intId).DeleteAsync();
+			// }
+			// else 
+			// {
+			// 	throw new BookNotFoundException();
+			// }
+
+			await dbContext.SaveChangesAsync();
+
 		}
 	}
 }

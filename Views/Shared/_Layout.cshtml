@@ -82,6 +82,11 @@
 		</nav>
 	</header>
 	<div class="container">
+		@if(TempData["ErrorMessage"] != null) {
+			<div class="alert alert-danger alert-dismissable mt-3" role="alert">
+				@TempData["ErrorMessage"]
+			</div>
+		}
 		@if(TempData["ConfirmationMessage"] != null) {
 			<div class="alert alert-success alert-dismissable mt-3" role="alert">
 				@TempData["ConfirmationMessage"]
