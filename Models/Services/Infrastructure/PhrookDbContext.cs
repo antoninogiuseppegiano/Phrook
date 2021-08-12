@@ -1,13 +1,14 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Phrook.Models.Entities;
 
 #nullable disable
 
 namespace Phrook.Models.Services.Infrastructure
 {
-    public partial class PhrookDbContext : DbContext
+    public partial class PhrookDbContext : IdentityDbContext
     {
         public PhrookDbContext(DbContextOptions<PhrookDbContext> options)
             : base(options)
@@ -18,6 +19,8 @@ namespace Phrook.Models.Services.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+			base.OnModelCreating(modelBuilder);
+			
             modelBuilder.Entity<Book>(entity =>
             {
 				entity.ToTable("Books");

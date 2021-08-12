@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,11 +42,12 @@ namespace Phrook
 			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
 			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>
 			{
-				// string connectionString = Configuration.GetSection("ConnectionStrings").GetValue<string>("Default");
 				string connectionString = Configuration["ConnectionStrings:Default"];
-				// string connectionString = connectionStringOptions.CurrentValue.Default;
 				optionsBuilder.UseSqlite(connectionString);
 			});
+
+			services.AddDefaultIdentity<IdentityUser>()
+					.AddEntityFrameworkStores<PhrookDbContext>();
 
 			#region OPTIONS
 			services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
@@ -90,7 +92,8 @@ namespace Phrook
 
 			app.UseRouting();
 			
-			// app.UseAuthorization();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>
 			{
