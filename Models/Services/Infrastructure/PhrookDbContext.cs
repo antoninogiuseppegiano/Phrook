@@ -8,7 +8,7 @@ using Phrook.Models.Entities;
 
 namespace Phrook.Models.Services.Infrastructure
 {
-    public partial class PhrookDbContext : IdentityDbContext
+    public partial class PhrookDbContext : IdentityDbContext<ApplicationUser>
     {
         public PhrookDbContext(DbContextOptions<PhrookDbContext> options)
             : base(options)

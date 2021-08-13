@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Phrook.Customizations.Identity;
+using Phrook.Models.Entities;
 using Phrook.Models.Options;
 using Phrook.Models.Services.Application;
 using Phrook.Models.Services.HttpClients;
@@ -47,7 +48,7 @@ namespace Phrook
 				optionsBuilder.UseSqlite(connectionString);
 			});
 
-			services.AddDefaultIdentity<IdentityUser>(options => {
+			services.AddDefaultIdentity<ApplicationUser>(options => {
 				options.Password.RequireDigit = true;
 				options.Password.RequiredLength = 8;
 				options.Password.RequiredUniqueChars = 4;
@@ -55,7 +56,7 @@ namespace Phrook
 				options.Password.RequireLowercase = true;				
 				options.Password.RequireNonAlphanumeric = true;
 			})
-			.AddPasswordValidator<CommonPasswordValidator<IdentityUser>>()
+			.AddPasswordValidator<CommonPasswordValidator<ApplicationUser>>()
 			.AddEntityFrameworkStores<PhrookDbContext>();
 
 			#region OPTIONS

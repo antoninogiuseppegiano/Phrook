@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Phrook.Models.Entities;
 
 namespace Phrook.Areas.Identity.Pages.Account.Manage
 {
     public class SetPasswordModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public SetPasswordModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -32,7 +33,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
         {
             [Required(ErrorMessage = "La password è obbligatoria")]
             // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [StringLength(8, ErrorMessage = "La nuova password deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
+            [StringLength(20, ErrorMessage = "La nuova password deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
             [DataType(DataType.Password)]
             [Display(Name = "Nuova password")]/* New password */
             public string NewPassword { get; set; }

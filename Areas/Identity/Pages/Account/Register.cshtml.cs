@@ -13,20 +13,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Phrook.Models.Entities;
 
 namespace Phrook.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -45,14 +46,19 @@ namespace Phrook.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+			[Required(ErrorMessage = "Il nome completo è obbligatorio")]
+            [StringLength(50, MinimumLength = 3, ErrorMessage = "Il nome completo deve essere almeno di {2} caratteri e un massimo di {1} caratteri.")]
+            [Display(Name = "Nome completo")]
+            public string FullName { get; set; }
+
+            [Required(ErrorMessage = "L'email è obbligatoria")]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
             [Required]
             // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [StringLength(8, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
+            [StringLength(20, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
@@ -75,7 +81,8 @@ namespace Phrook.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                // var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FullName = Input.FullName };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

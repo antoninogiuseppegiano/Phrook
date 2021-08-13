@@ -1,4 +1,4 @@
-@inject SignInManager<IdentityUser> signInManager
+@inject SignInManager<ApplicationUser> signInManager
 
 @* says if is authenticated via Identity, instead of User.Identity.IsAuthenticated that says only if auth *@
 @if(signInManager.IsSignedIn(User)) 

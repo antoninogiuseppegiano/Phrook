@@ -9,15 +9,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Phrook.Models.Entities;
 
 namespace Phrook.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ResetPasswordModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ResetPasswordModel(UserManager<IdentityUser> userManager)
+        public ResetPasswordModel(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
@@ -33,7 +34,7 @@ namespace Phrook.Areas.Identity.Pages.Account
 
             [Required]
             // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [StringLength(8, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
+            [StringLength(20, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
 
             [DataType(DataType.Password)]
             public string Password { get; set; }
