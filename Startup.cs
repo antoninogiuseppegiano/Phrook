@@ -56,6 +56,7 @@ namespace Phrook
 				options.Password.RequireLowercase = true;				
 				options.Password.RequireNonAlphanumeric = true;
 			})
+			.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
 			.AddPasswordValidator<CommonPasswordValidator<ApplicationUser>>()
 			.AddEntityFrameworkStores<PhrookDbContext>();
 
