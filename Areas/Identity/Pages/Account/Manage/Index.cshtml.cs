@@ -36,6 +36,10 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             [Phone(ErrorMessage = "Deve essere un numero di telefono valido")]
             [Display(Name = "Numero di telefono")]/* Phone number */
             public string PhoneNumber { get; set; }
+			
+			[StringLength(50, MinimumLength = 3, ErrorMessage = "Il nome completo deve essere almeno di {2} caratteri e un massimo di {1} caratteri.")]
+            [Display(Name = "Nome completo")]/* Phone number */
+            public string FullName { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -47,7 +51,8 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+				FullName = user.FullName
             };
         }
 
@@ -75,6 +80,17 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             {
                 await LoadAsync(user);
                 return Page();
+            }
+
+            if (Input.FullName != user.FullName)
+            {
+				user.FullName = Input.FullName;
+                var setFullNameResult = await _userManager.UpdateAsync(user);
+                if (!setFullNameResult.Succeeded)
+                {
+                    StatusMessage = "Errore imprevisto durante il tentativo di impostare il nome completo.";/* Unexpected error when trying to set full name. */
+                    return RedirectToPage();
+                }
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
