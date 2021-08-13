@@ -28,14 +28,13 @@ namespace Phrook.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "L'indirizzo email è obbligatorio")]
+            [EmailAddress(ErrorMessage = "Non è un indirizzo email valido")]
             public string Email { get; set; }
 
-            [Required]
+			[Required(ErrorMessage = "La password è obbligatoria")]
             // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [StringLength(20, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
-
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
@@ -51,7 +50,7 @@ namespace Phrook.Areas.Identity.Pages.Account
         {
             if (code == null)
             {
-                return BadRequest("È necessario fornire un codice per il recupero della password.");/* A code must be supplied for password reset. */
+                return BadRequest("È necessario fornire un codice per la reimpostazione della password.");/* A code must be supplied for password reset. */
             }
             else
             {

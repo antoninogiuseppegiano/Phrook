@@ -31,8 +31,8 @@ namespace Phrook.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+			[Required(ErrorMessage = "L'email è obbligatoria")]
+            [EmailAddress(ErrorMessage = "Deve essere un indirizzo email valido")]
             public string Email { get; set; }
         }
 
@@ -66,7 +66,7 @@ namespace Phrook.Areas.Identity.Pages.Account
                 Input.Email,
                 "Conferma la tua email",/* Confirm your email */
                 // $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                $"Per favore conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");
+                $"Per favore, conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");
 
             ModelState.AddModelError(string.Empty, "Ti è stato inviato un link di conferma via email. Per favore, controlla la tua email.");/* Verification email sent. Please check your email. */
             return Page();

@@ -43,8 +43,8 @@ namespace Phrook.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "L'email è obbligatoria")]
+            [EmailAddress(ErrorMessage = "Deve essere un indirizzo email valido")]
             public string Email { get; set; }
 
             [Required]
@@ -85,7 +85,7 @@ namespace Phrook.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("Utente loggato.");/* User logged in. */
+                    _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -94,7 +94,7 @@ namespace Phrook.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("Account utente bloccato.");/* User account locked out. */
+                    _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else

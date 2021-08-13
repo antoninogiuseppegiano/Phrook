@@ -31,8 +31,8 @@ namespace Phrook.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "L'email è obbligatoria")]
+            [EmailAddress(ErrorMessage = "Deve essere un indirizzo email valido")]
             public string Email { get; set; }
         }
 

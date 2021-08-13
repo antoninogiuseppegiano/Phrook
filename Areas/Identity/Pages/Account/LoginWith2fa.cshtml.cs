@@ -40,7 +40,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             [Display(Name = "Codice di autenticazione")]/* Authenticator code */
             public string TwoFactorCode { get; set; }
 
-            [Display(Name = "Ricorda questa macchina")]/* Remember this machine */
+            [Display(Name = "Ricorda questo dispositivo")]/* Remember this machine */
             public bool RememberMachine { get; set; }
         }
 
@@ -81,17 +81,17 @@ namespace Phrook.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("L'utente con ID '{UserId}' ha effettuato l'accesso con 2fa.", user.Id);/* User with ID '{UserId}' logged in with 2fa. */
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                _logger.LogWarning("Account utente con ID '{UserId}' bloccato.", user.Id);/* User with ID '{UserId}' account locked out. */
+                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                _logger.LogWarning("È stato inserito un codice autenticatore non valido per l'utente con ID '{UserId}'.", user.Id);/* Invalid authenticator code entered for user with ID '{UserId}'. */
+                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
                 ModelState.AddModelError(string.Empty, "Codice autenticatore non valido.");/* Invalid authenticator code. */
                 return Page();
             }
