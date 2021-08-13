@@ -46,10 +46,10 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Il codice di verifica è obbligatorio")]
+            [StringLength(7, ErrorMessage = "Il codice di verifica deve essere lungo almeno {2} e massimo {1} caratteri.", MinimumLength = 6)]
             [DataType(DataType.Text)]
-            [Display(Name = "Verification Code")]
+            [Display(Name = "Codice di verifica")]/* Verification Code */
             public string Code { get; set; }
         }
 
@@ -58,7 +58,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             await LoadSharedKeyAndQrCodeUriAsync(user);
@@ -71,7 +71,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             if (!ModelState.IsValid)
@@ -88,7 +88,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
             if (!is2faTokenValid)
             {
-                ModelState.AddModelError("Input.Code", "Verification code is invalid.");
+                ModelState.AddModelError("Input.Code", "Il codice di verifica non è valido.");/* Verification code is invalid. */
                 await LoadSharedKeyAndQrCodeUriAsync(user);
                 return Page();
             }
@@ -97,7 +97,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var userId = await _userManager.GetUserIdAsync(user);
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
-            StatusMessage = "Your authenticator app has been verified.";
+            StatusMessage = "La tua app di autenticazione è stata verificata.";/* Your authenticator app has been verified. */
 
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {

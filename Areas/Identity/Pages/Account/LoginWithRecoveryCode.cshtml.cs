@@ -43,7 +43,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException($"Impossibile caricare l'utente con autenticazione a due fattori.");/* Unable to load two-factor authentication user. */
             }
 
             ReturnUrl = returnUrl;
@@ -61,7 +61,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException($"Impossibile caricare l'utente con autenticazione a due fattori.");/* Unable to load two-factor authentication user. */
             }
 
             var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
@@ -70,17 +70,17 @@ namespace Phrook.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
+                _logger.LogInformation("L'utente con ID '{UserId}' ha effettuato l'accesso con un codice di recupero.", user.Id);/* User with ID '{UserId}' logged in with a recovery code. */
                 return LocalRedirect(returnUrl ?? Url.Content("~/"));
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+                _logger.LogWarning("Account utente con ID '{UserId}' bloccato.", user.Id);/* User with ID '{UserId}' account locked out. */
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
+                _logger.LogWarning("È stato inserito un codice  di recupero non valido per l'utente con ID '{UserId}'", user.Id);/* Invalid recovery code entered for user with ID '{UserId}'  */
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return Page();
             }

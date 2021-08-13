@@ -33,12 +33,13 @@ namespace Phrook.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            // [StringLength(7, ErrorMessage = "La {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(7, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri", MinimumLength = 6)]
             [DataType(DataType.Text)]
-            [Display(Name = "Authenticator code")]
+            [Display(Name = "Codice di autenticazione")]/* Authenticator code */
             public string TwoFactorCode { get; set; }
 
-            [Display(Name = "Remember this machine")]
+            [Display(Name = "Ricorda questa macchina")]/* Remember this machine */
             public bool RememberMachine { get; set; }
         }
 
@@ -49,7 +50,7 @@ namespace Phrook.Areas.Identity.Pages.Account
 
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException($"Impossibile caricare l'utente con autenticazione a due fattori.");/* Unable to load two-factor authentication user. */
             }
 
             ReturnUrl = returnUrl;
@@ -70,7 +71,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException($"Impossibile caricare l'utente con autenticazione a due fattori.");/* Unable to load two-factor authentication user. */
             }
 
             var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
@@ -79,18 +80,18 @@ namespace Phrook.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
+                _logger.LogInformation("L'utente con ID '{UserId}' ha effettuato l'accesso con 2fa.", user.Id);/* User with ID '{UserId}' logged in with 2fa. */
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+                _logger.LogWarning("Account utente con ID '{UserId}' bloccato.", user.Id);/* User with ID '{UserId}' account locked out. */
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+                _logger.LogWarning("È stato inserito un codice autenticatore non valido per l'utente con ID '{UserId}'.", user.Id);/* Invalid authenticator code entered for user with ID '{UserId}'. */
+                ModelState.AddModelError(string.Empty, "Codice autenticatore non valido.");/* Invalid authenticator code. */
                 return Page();
             }
         }

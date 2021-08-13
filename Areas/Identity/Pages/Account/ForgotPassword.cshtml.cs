@@ -58,8 +58,8 @@ namespace Phrook.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Reimposta password.",/* Reset Password */
+                    $"Per favore, reimposta la tua password <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");/* Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>. */
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

@@ -32,8 +32,8 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Phone]
-            [Display(Name = "Phone number")]
+            [Phone(ErrorMessage = "Deve essere un numero di telefono valido")]
+            [Display(Name = "Numero di telefono")]/* Phone number */
             public string PhoneNumber { get; set; }
         }
 
@@ -55,7 +55,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             await LoadAsync(user);
@@ -67,7 +67,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             if (!ModelState.IsValid)
@@ -82,13 +82,13 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = "Errore imprevisto durante il tentativo di impostare il numero di telefono.";/* Unexpected error when trying to set phone number. */
                     return RedirectToPage();
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Il tuo profilo è stato aggiornato";/* Your profile has been updated */
             return RedirectToPage();
         }
     }

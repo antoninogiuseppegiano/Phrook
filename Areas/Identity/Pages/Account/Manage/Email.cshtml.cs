@@ -43,9 +43,9 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "La nuova email è obbligatoria")]
             [EmailAddress]
-            [Display(Name = "New email")]
+            [Display(Name = "Nuova email")]/* New email */
             public string NewEmail { get; set; }
         }
 
@@ -67,7 +67,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID  '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             await LoadAsync(user);
@@ -79,7 +79,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             if (!ModelState.IsValid)
@@ -101,14 +101,15 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
                     protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Conferma la tua email",/* Confirm your email */
+                    // $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    $"Per favore, conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                StatusMessage = "Ti è stato inviato un link di conferma via email. Per favore, controlla la tua email.";/* Confirmation link to change email sent. Please check your email. */
                 return RedirectToPage();
             }
 
-            StatusMessage = "Your email is unchanged.";
+            StatusMessage = "La tua email non è stata cambiata.";/* Your email is unchanged. */
             return RedirectToPage();
         }
 
@@ -117,7 +118,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             if (!ModelState.IsValid)
@@ -137,10 +138,11 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                "Conferma la tua email",/* Confirm your email */
+                // $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+				$"Per favore, conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "Ti è stato inviato un link di conferma via email. Per favore, controlla la tua email.";/* Verification email sent. Please check your email. */
             return RedirectToPage();
         }
     }

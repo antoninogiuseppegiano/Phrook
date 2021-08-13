@@ -33,20 +33,21 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "La password attuale è obbligatoria")]
             [DataType(DataType.Password)]
-            [Display(Name = "Current password")]
+            [Display(Name = "Password attuale")]/* Current password */
             public string OldPassword { get; set; }
 
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "La nuova password è obbligatoria")]
+            // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(8, ErrorMessage = "La pasword deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
             [DataType(DataType.Password)]
-            [Display(Name = "New password")]
+            [Display(Name = "Nuova password")]
             public string NewPassword { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+            [Display(Name = "Conferma nuova password")]
+            [Compare("NewPassword", ErrorMessage = "La nuova password e la password di conferma non corrispondono.")]/* The new password and confirmation password do not match. */
             public string ConfirmPassword { get; set; }
         }
 
@@ -55,7 +56,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -77,7 +78,7 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
@@ -91,8 +92,8 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
+            _logger.LogInformation("User changed their password successfully");
+            StatusMessage = "La tua password è stata modificata.";/* Your password has been changed. */
 
             return RedirectToPage();
         }

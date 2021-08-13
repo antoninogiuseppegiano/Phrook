@@ -71,13 +71,13 @@ namespace Phrook.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (remoteError != null)
             {
-                ErrorMessage = $"Error from external provider: {remoteError}";
+                ErrorMessage = $"Errore da provider esterno: {remoteError}";/* Error from external provider:  */
                 return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                ErrorMessage = "Error loading external login information.";
+                ErrorMessage = "Errore durante il caricamento delle informazioni di accesso esterno.";/* Error loading external login information. */
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
@@ -85,7 +85,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                _logger.LogInformation("{Name} ha effettuato l'accesso con il provider {LoginProvider}.", info.Principal.Identity.Name, info.LoginProvider);/* {Name} logged in with {LoginProvider} provider. */
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -115,7 +115,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                ErrorMessage = "Error loading external login information during confirmation.";
+                ErrorMessage = "Errore durante il caricamento delle informazioni di accesso esterno durante la conferma.";/* Error loading external login information during confirmation. */
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
@@ -129,7 +129,7 @@ namespace Phrook.Areas.Identity.Pages.Account
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        _logger.LogInformation("L'utente ha creato un account utilizzando il provider {Name}.", info.LoginProvider);/* User created an account using {Name} provider. */
 
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -140,8 +140,8 @@ namespace Phrook.Areas.Identity.Pages.Account
                             values: new { area = "Identity", userId = userId, code = code },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        await _emailSender.SendEmailAsync(Input.Email, "Conferma la tua email",/* Confirm your email */
+                            $"Per favore, conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");/* Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>. */
 
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)

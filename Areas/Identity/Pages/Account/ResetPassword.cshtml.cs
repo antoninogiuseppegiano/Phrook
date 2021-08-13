@@ -32,13 +32,15 @@ namespace Phrook.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(8, ErrorMessage = "La {0} deve contenere almeno {2} caratteri e un massimo di {1} caratteri.", MinimumLength = 4)]
+
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Conferma password")]/* Confirm password */
+            [Compare("Password", ErrorMessage = "La password e la password di conferma non corrispondono.")]/* The password and confirmation password do not match. */
             public string ConfirmPassword { get; set; }
 
             public string Code { get; set; }
@@ -48,7 +50,7 @@ namespace Phrook.Areas.Identity.Pages.Account
         {
             if (code == null)
             {
-                return BadRequest("A code must be supplied for password reset.");
+                return BadRequest("È necessario fornire un codice per il recupero della password.");/* A code must be supplied for password reset. */
             }
             else
             {

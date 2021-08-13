@@ -36,7 +36,8 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID 'user.Id'.");
+                // return NotFound($"Unable to load user with ID 'user.Id'.");
+				return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             CurrentLogins = await _userManager.GetLoginsAsync(user);
@@ -52,18 +53,19 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID 'user.Id'.");
+                // return NotFound($"Unable to load user with ID 'user.Id'.");
+				return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             var result = await _userManager.RemoveLoginAsync(user, loginProvider, providerKey);
             if (!result.Succeeded)
             {
-                StatusMessage = "The external login was not removed.";
+                StatusMessage = "Il servizio di autenticazione esterno non è stato rimosso.";/* The external login was not removed. */
                 return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "The external login was removed.";
+            StatusMessage = "Il servizio di autenticazione esterno è stato rimosso.";/* The external login was removed. */
             return RedirectToPage();
         }
 
@@ -83,26 +85,27 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID 'user.Id'.");
+                // return NotFound($"Unable to load user with ID 'user.Id'.");
+				return NotFound($"Impossibile caricare l'utente con ID '{_userManager.GetUserId(User)}'.");/* Unable to load user with ID  */
             }
 
             var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
             if (info == null)
             {
-                throw new InvalidOperationException($"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
+                throw new InvalidOperationException($"Si è verificato un errore imprevisto durante il caricamento dei servizi di autenticazione per il profilo utente con ID '{user.Id}'.");/* Unexpected error occurred loading external login info for user with ID  */
             }
 
             var result = await _userManager.AddLoginAsync(user, info);
             if (!result.Succeeded)
             {
-                StatusMessage = "The external login was not added. External logins can only be associated with one account.";
+                StatusMessage = "Il servizio di autenticazione esterno non è stata aggiunto. I servizi esterni possono essere associati a un solo account.";/* The external login was not added. External logins can only be associated with one account. */
                 return RedirectToPage();
             }
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            StatusMessage = "The external login was added.";
+            StatusMessage = "Il servizio di autenticazione esterno è stato aggiunto.";
             return RedirectToPage();
         }
     }
