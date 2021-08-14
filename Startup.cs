@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,8 +41,17 @@ namespace Phrook
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddRazorPages();
-			services.AddMvc();
+			services.AddRazorPages(options => 
+			{
+				options.Conventions.AllowAnonymousToPage("/Privacy");
+			});
+			services.AddMvc(options => 
+			{
+				AuthorizationPolicyBuilder pb = new();
+				AuthorizationPolicy ap = pb.RequireAuthenticatedUser().Build();
+				AuthorizeFilter filter = new(ap);
+				options.Filters.Add(filter);
+			});
 			services.AddTransient<IBookService, EfCoreBookService>();
 			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
 			

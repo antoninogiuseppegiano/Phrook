@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Phrook.Models.Exceptions;
@@ -7,7 +8,8 @@ namespace Phrook.Controllers
 {
     public class ErrorController : Controller
     {
-        public IActionResult Index() {
+        [AllowAnonymous]
+		public IActionResult Index() {
 			var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 			
 			//TODO: spostare in servizio applicativo ErrorViewSelector
