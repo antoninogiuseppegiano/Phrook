@@ -2,4 +2,4 @@ bin
 obj
 _other_files
 .vscode/*
-Data/phrook.dbbckp
+*.dbbckp
