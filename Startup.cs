@@ -57,7 +57,12 @@ namespace Phrook
 				options.Password.RequireUppercase = true;
 				options.Password.RequireLowercase = true;				
 				options.Password.RequireNonAlphanumeric = true;
+
 				options.SignIn.RequireConfirmedAccount = true;
+				
+				options.Lockout.AllowedForNewUsers = true; //by default
+				options.Lockout.MaxFailedAccessAttempts = 5;
+				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
 			})
 			.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
 			.AddPasswordValidator<CommonPasswordValidator<ApplicationUser>>()
