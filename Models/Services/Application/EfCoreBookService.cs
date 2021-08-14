@@ -35,21 +35,21 @@ namespace Phrook.Models.Services.Application
 			BookDetailViewModel book;
 			try {
 				int.TryParse(id, out int intId);
-				var query = dbContext.Books
+				var query = dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(book => book.Id == intId)
-				.Select(book =>
+				.Where(libraryBook => libraryBook.BookId == intId) //TODO: inserire controll per UserId
+				.Select(libraryBook =>
 				new BookDetailViewModel
 				{
-					Id = book.Id,
-					ISBN = book.Isbn,
-					Title = book.Title,
-					Author = book.Author,
-					ImagePath = book.ImagePath,
-					Rating = book.Rating,
-					Tag = book.Tag,
-					ReadingState = book.ReadingState,
-					Description = book.Description
+					Id = libraryBook.BookId,
+					ISBN = libraryBook.Book.Isbn,
+					Title = libraryBook.Book.Title,
+					Author = libraryBook.Book.Author,
+					ImagePath = libraryBook.Book.ImagePath,
+					Rating = libraryBook.Rating,
+					Tag = libraryBook.Tag,
+					ReadingState = libraryBook.ReadingState,
+					Description = libraryBook.Book.Description
 				});
 				book = await query.SingleAsync();
 			}
@@ -66,46 +66,46 @@ namespace Phrook.Models.Services.Application
 			logger.LogInformation("Book list requested.");
 
 			//Ricerca
-			IQueryable<Book> baseQuery = dbContext.Books;
+			IQueryable<LibraryBook> baseQuery = dbContext.LibraryBooks;
 
 			switch(model.OrderBy) {
 				case "Title":
-					if(model.Ascending) { baseQuery = baseQuery.OrderBy(book => book.Title); }
-					else { baseQuery = baseQuery.OrderByDescending(book => book.Title); }
+					if(model.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.Book.Title); }
+					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.Book.Title); }
 					break;
 				case "Author":
-					if(model.Ascending) { baseQuery = baseQuery.OrderBy(book => book.Author); }
-					else { baseQuery = baseQuery.OrderByDescending(book => book.Author); }
+					if(model.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.Book.Author); }
+					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.Book.Author); }
 					break;
 				case "ReadingState":
-					if(model.Ascending) { baseQuery = baseQuery.OrderBy(book => book.ReadingState); }
-					else { baseQuery = baseQuery.OrderByDescending(book => book.ReadingState); }
+					if(model.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.ReadingState); }
+					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.ReadingState); }
 					break;
 				case "Rating":
-					if(model.Ascending) { baseQuery = baseQuery.OrderBy(book => book.Rating); }
-					else { baseQuery = baseQuery.OrderByDescending(book => book.Rating); }
+					if(model.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.Rating); }
+					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.Rating); }
 					break;
 				case "Tag":
-					if(model.Ascending) { baseQuery = baseQuery.OrderBy(book => book.Tag); }
-					else { baseQuery = baseQuery.OrderByDescending(book => book.Tag); }
+					if(model.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.Tag); }
+					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.Tag); }
 					break;
 			}
 
 			IQueryable<BookViewModel> query = baseQuery
 			.AsNoTracking()
 			//TODO: implementare fuzzy
-			.Where(book => book.Title.Contains(model.Search))
-			.Select(book =>
+			.Where(libraryBook => libraryBook.Book.Title.Contains(model.Search))//TODO: inserire controll per UserId
+			.Select(libraryBook =>
 			new BookViewModel
 			{
-				Id = book.Id,
-				ISBN = book.Isbn,
-				Title = book.Title,
-				Author = book.Author,
-				ImagePath = book.ImagePath,
-				Rating = book.Rating,
-				Tag = book.Tag,
-				ReadingState = book.ReadingState
+				Id = libraryBook.Book.Id,
+				ISBN = libraryBook.Book.Isbn,
+				Title = libraryBook.Book.Title,
+				Author = libraryBook.Book.Author,
+				ImagePath = libraryBook.Book.ImagePath,
+				Rating = libraryBook.Rating,
+				Tag = libraryBook.Tag,
+				ReadingState = libraryBook.ReadingState
 			});
 
 			List<BookViewModel> books = await query
@@ -121,27 +121,26 @@ namespace Phrook.Models.Services.Application
 			return result;
 		}
 
-		
 		public async Task<BookDetailViewModel> GetBookByISBNAsync(string ISBN)
 		{
 			logger.LogInformation("Book id: {ISBN} requested.", ISBN);
 			BookDetailViewModel book;
 			try {
-				book = await dbContext.Books
+				book = await dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(book => book.Isbn.Equals(ISBN))
-				.Select(book =>
+				.Where(libraryBook => libraryBook.Book.Isbn.Equals(ISBN))//TODO: inserire controll per UserId
+				.Select(libraryBook =>
 				new BookDetailViewModel
 				{
-					Id = book.Id,
-					ISBN = book.Isbn,
-					Title = book.Title,
-					Author = book.Author,
-					ImagePath = book.ImagePath,
-					Rating = book.Rating,
-					Tag = book.Tag,
-					ReadingState = book.ReadingState,
-					Description = book.Description
+					Id = libraryBook.BookId,
+					ISBN = libraryBook.Book.Isbn,
+					Title = libraryBook.Book.Title,
+					Author = libraryBook.Book.Author,
+					ImagePath = libraryBook.Book.ImagePath,
+					Rating = libraryBook.Rating,
+					Tag = libraryBook.Tag,
+					ReadingState = libraryBook.ReadingState,
+					Description = libraryBook.Book.Description
 				})
 				.SingleAsync();
 			}
@@ -155,7 +154,7 @@ namespace Phrook.Models.Services.Application
 		
 		public async Task<BookDetailViewModel> EditBookAsync(EditBookInputModel inputModel) 
 		{
-			Book book = await dbContext.Books.FindAsync(inputModel.Id);
+			LibraryBook book = await dbContext.LibraryBooks.Where(librarybook => librarybook.BookId == inputModel.Id).FirstOrDefaultAsync();//TODO: inserire controll per UserId
 
 			book.ChangeRating(inputModel.Rating);
 			book.ChangeTag(inputModel.Tag);
@@ -177,12 +176,12 @@ namespace Phrook.Models.Services.Application
 			// }
 
 			return new BookDetailViewModel {
-                Id = book.Id,
-				ISBN = book.Isbn,
-                Title = book.Title,
-                Description = book.Description,
-                Author = book.Author,
-                ImagePath = book.ImagePath,
+                Id = book.BookId,
+				ISBN = book.Book.Isbn,
+                Title = book.Book.Title,
+                Description = book.Book.Description,
+                Author = book.Book.Author,
+                ImagePath = book.Book.ImagePath,
                 Rating = book.Rating,
 				Tag = book.Tag,
 				ReadingState = book.ReadingState
@@ -195,20 +194,20 @@ namespace Phrook.Models.Services.Application
 			IQueryable<EditBookInputModel> query;
 			try{
 				int.TryParse(id, out int intId);
-				query = dbContext.Books
+				query = dbContext.LibraryBooks
 				.AsNoTracking()
 				//TODO: implementare fuzzy
-				.Where(book => book.Id == intId)
-				.Select(book =>
+				.Where(libraryBook => libraryBook.BookId == intId)//TODO: inserire controll per UserId
+				.Select(librarybook =>
 				new EditBookInputModel
 				{
-					Id = book.Id,
-					Title = book.Title,
+					Id = librarybook.BookId,
+					Title = librarybook.Book.Title,
 
-					Rating = book.Rating,
-					Tag = book.Tag,
-					ReadingState = book.ReadingState,
-					RowVersion = book.RowVersion
+					Rating = librarybook.Rating,
+					Tag = librarybook.Tag,
+					ReadingState = librarybook.ReadingState,
+					RowVersion = librarybook.RowVersion
 				});
 
 				EditBookInputModel book = await query.SingleAsync();
@@ -223,12 +222,12 @@ namespace Phrook.Models.Services.Application
 
 		public async Task RemoveBookFromLibrary(string id)
 		{
-			
-			Book book = await dbContext.Books.FindAsync(id);
-			if(book is null) 
-			{
-				throw new BookNotFoundException();
-			}
+			int.TryParse(id, out int intId);
+			// LibraryBook book = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.BookId = intId).FirstOrDefaultAsync();//TODO: inserire controll per UserId
+			// if(book is null) 
+			// {
+			// 	throw new BookNotFoundException();
+			// }
 			//TODO: ritrovare utente e rimuovere il libero dalla sua libreria (creare exception per eventuali errori?)
 
 			//TODO: Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
@@ -236,16 +235,22 @@ namespace Phrook.Models.Services.Application
 				// Book book = await dbContext.Books.FindAsync(id);
 				// dbContext.Remove(book);
 			// eliminazione dal db con EF Core PLUS
-			// if(int.TryParse(id, out int intId))
-			// {
-			// 	await dbContext.Books.Where(book => book.Id == intId).DeleteAsync();
-			// }
-			// else 
-			// {
-			// 	throw new BookNotFoundException();
-			// }
+			
+			int affectedRows = await dbContext.Books.Where(book => book.Id == intId).DeleteAsync();
+			if(affectedRows is 1)//TODO: inserire controll per UserId
+			{
+				await dbContext.SaveChangesAsync();
+			}
+			else  if (affectedRows is 0)
+			{
+				throw new BookNotFoundException();
+			}
+			else 
+			{
+				throw new TooManyRowsException(affectedRows);
+			}
 
-			await dbContext.SaveChangesAsync();
+			
 
 		}
 	}
