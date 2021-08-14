@@ -3,3 +3,5 @@ obj
 _other_files
 .vscode/*
 *.dbbckp
+Data/Phrook.db-shm
+Data/Phrook.db-wal
