@@ -13,11 +13,11 @@ namespace Phrook.Models.Entities
         {
 		    if (string.IsNullOrWhiteSpace(title))
             {
-                throw new ArgumentException("The course must have a title");
+                throw new ArgumentException("Il libro deve avere un titolo");
             }
 			if (string.IsNullOrWhiteSpace(author))
             {
-                throw new ArgumentException("The course must have an author");
+                throw new ArgumentException("Il libro deve avere un autore");
             }   
             Title = title;
             Author = author;
@@ -30,11 +30,12 @@ namespace Phrook.Models.Entities
         public string Description { get; private set; }
         public string ImagePath { get; private set; }
         public string Author { get; private set; }
-        public double Rating { get; private set; }
+        #region da eliminare
+		public double Rating { get; private set; }
         public string Tag { get; private set; }
         public string ReadingState { get; private set; }
         public string RowVersion { get; private set; }
-
+		#endregion
 		// ICollection<Review> Reviews { get; set; }
 
 		public void ChangeRating(double newRating)
@@ -50,22 +51,20 @@ namespace Phrook.Models.Entities
         {
 			int.TryParse(s_newTagIndex, out int newTagIndex);
             // if (!Enum.IsDefined(typeof(Tag), newTag))
-			if(newTagIndex <= 0 && Enum.GetValues<Tag>().Length <= newTagIndex)
+			if(!Enum.IsDefined(typeof(Tag), newTagIndex))
             {
             	throw new ArgumentException("This tag value isn't valid.");
             }
-			Tag newTag = (Tag)newTagIndex;
-            Tag = newTag.ToString();
+            Tag = ((Tag)newTagIndex).ToString();
         }
 
 		public void ChangeReadingState(string s_newReadingStateIndex)
         {
 			int.TryParse(s_newReadingStateIndex, out int newReadingStateIndex);
-
-            // if (!Enum.IsDefined(typeof(ReadingState), newReadingState))
-            // {
-            //     throw new ArgumentException("This reading state value isn't valid.");
-            // }
+            if (!Enum.IsDefined(typeof(ReadingState), newReadingStateIndex))
+            {
+                throw new ArgumentException("This reading state value isn't valid.");
+            }
             ReadingState = ((ReadingState)newReadingStateIndex).ToString();
         }
     }
