@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,7 @@ namespace Phrook
 			services.AddMvc();
 			services.AddTransient<IBookService, EfCoreBookService>();
 			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
+			
 			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>
 			{
 				string connectionString = Configuration["ConnectionStrings:Default"];
@@ -55,16 +57,20 @@ namespace Phrook
 				options.Password.RequireUppercase = true;
 				options.Password.RequireLowercase = true;				
 				options.Password.RequireNonAlphanumeric = true;
+				options.SignIn.RequireConfirmedAccount = true;
 			})
 			.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
 			.AddPasswordValidator<CommonPasswordValidator<ApplicationUser>>()
 			.AddEntityFrameworkStores<PhrookDbContext>();
+
+			services.AddSingleton<IEmailSender, MailKitEmailSender>();
 
 			#region OPTIONS
 			services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
 			services.Configure<BooksOptions>(Configuration.GetSection("Books"));
 			services.Configure<BooksOrderOptions>(Configuration.GetSection("Books:Order"));
 			services.Configure<GoogleBooksApiOptions>(Configuration.GetSection("GoogleBooksApi"));
+			services.Configure<SmtpOptions>(Configuration.GetSection("Smtp"));
 			#endregion
 		}
 
