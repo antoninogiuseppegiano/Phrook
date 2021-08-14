@@ -25,7 +25,7 @@ namespace Phrook.Customizations.ModelBinders
 
 			//creating input model
 			BooksOptions options = booksOptions.CurrentValue;
-			var inputModel = new BookListInputModel(search, page, orderBy, ascending, options.PerPage, options.Order);
+			BookListInputModel inputModel = new (search, page, orderBy, ascending, options.PerPage, options.Order);
 
 			//successful binding
 			bindingContext.Result = ModelBindingResult.Success(inputModel);

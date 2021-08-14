@@ -28,7 +28,7 @@ namespace Phrook.Controllers
 		{
 			ListViewModel<BookViewModel> books = await _bookService.GetBooksAsync(input);
 
-			var viewModel = new BookListViewModel
+			BookListViewModel viewModel = new()
 			{
 				Books = books,
 				Input = input
@@ -159,7 +159,7 @@ namespace Phrook.Controllers
 				overviewViewModel = null;
 			}
 
-			var viewModel =  new SearchBookViewModel {
+			SearchBookViewModel viewModel =  new()  {
 				Book = overviewViewModel,
 				Search = searchISBN
 			};
