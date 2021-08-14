@@ -1,43 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+
+using System;
 using Phrook.Models.Enums;
-using Phrook.Models;
+using Phrook.Models.Services.Application;
 
 #nullable disable
 
 namespace Phrook.Models.Entities
 {
-    public partial class Book
-    {
-		public Book(string title, string author)
+	public partial class LibraryBook
+	{
+		public LibraryBook(int bookId, string userId)
         {
-		    if (string.IsNullOrWhiteSpace(title))
+			//TODO: validazione bookId e userId
+		    /* if ()
             {
-                throw new ArgumentException("Il libro deve avere un titolo");
+                throw new ArgumentException("Il libro non esiste"); //BookNotFoundException
             }
-			if (string.IsNullOrWhiteSpace(author))
+			if ()
             {
-                throw new ArgumentException("Il libro deve avere un autore");
-            }   
-            Title = title;
-            Author = author;
-			ImagePath = "/Books/default.png";
+                throw new ArgumentException("L'utente non esiste");
+            }  */  
+            BookId = bookId;
+            UserId = userId;
         }
-
-        public int Id { get; private set; }
-        public string Isbn { get; private set; }
-        public string Title { get; private set; }
-        public string Description { get; private set; }
-        public string ImagePath { get; private set; }
-        public string Author { get; private set; }
-        #region da eliminare e fare migration
+		public int Id { get; private set; }
+		public virtual Book Book { get; set; }
+        public int BookId { get; set; }
+		public virtual ApplicationUser User { get; set; }
+        public string UserId { get; set; }
 		public double Rating { get; private set; }
         public string Tag { get; private set; }
         public string ReadingState { get; private set; }
         public string RowVersion { get; private set; }
-		#endregion
-		public ICollection<LibraryBook> InLibrary { get; set; }
-
+		
 		public void ChangeRating(double newRating)
         {
             if (newRating < 1 || newRating > 5)
@@ -50,7 +45,6 @@ namespace Phrook.Models.Entities
 		public void ChangeTag(string s_newTagIndex)
         {
 			int.TryParse(s_newTagIndex, out int newTagIndex);
-            // if (!Enum.IsDefined(typeof(Tag), newTag))
 			if(!Enum.IsDefined(typeof(Tag), newTagIndex))
             {
             	throw new ArgumentException("This tag value isn't valid.");
@@ -67,5 +61,5 @@ namespace Phrook.Models.Entities
             }
             ReadingState = ((ReadingState)newReadingStateIndex).ToString();
         }
-    }
+	}
 }
