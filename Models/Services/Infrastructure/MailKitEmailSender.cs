@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Phrook.Models.Options;
+using Polly;
 
 namespace Phrook.Models.Services.Infrastructure
 {
@@ -37,7 +38,10 @@ namespace Phrook.Models.Services.Infrastructure
                 {
                     Text = htmlMessage
                 };
-                await client.SendAsync(message);
+				var policy = Policy
+					.Handle<Exception>()
+					.WaitAndRetryAsync(2, retry => TimeSpan.FromMilliseconds(200));
+				await policy.ExecuteAsync(() =>  client.SendAsync(message));
                 await client.DisconnectAsync(true);
             }
             catch (Exception exc)
