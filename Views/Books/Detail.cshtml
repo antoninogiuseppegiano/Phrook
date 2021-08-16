@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-9">
 			<div class="row">
-				<h1 class="mb-0">@Model.Title <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a></h1>
+				<h1 class="mb-0">@Model.Title</h1>
 				<span class="isbn">ISBN: @Model.ISBN</span>
 				<author>di @Model.Author</author>
 			</div>
@@ -13,24 +13,15 @@
 			</div>
         </div>
         <div class="col-md-3">
-            <aside>
-				@* <a href="#" class="btn btn-warning btn-lg btn-block button-book">Button</a> *@
-                
-                <img src="@Model.ImagePath" class="img-fluid course-image" alt="@Model.Title">
+            <aside class=" d-flex flex-column align-items-center">
+                <img src="@Model.ImagePath" class="img-fluid book-image" alt="@Model.Title">
 				<div class="rating d-flex justify-content-center" title="@Model.Rating">
                     <rating value="@Model.Rating"></rating>
                 </div>
+				<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
+				<p><span>@Model.Tag</span> - <span>@Model.ReadingState</span></o> 
 			</aside>
         </div>
     </div>
 
-	@* TODO aggiungere modifica reading state e tag (con form) *@
-	<div class="row">
-		<div class="col-md-12">
-		    @Model.Tag
-		</div>
-		<div class="col-md-12">
-		    @Model.ReadingState
-		</div>
-	</div>
 </section>

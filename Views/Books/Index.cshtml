@@ -16,20 +16,27 @@
 	</div>
 </div>
 
+
+
+@if(Model.Books.TotalCount > 0)
+{
 <div class="row d-flex align-items-center">
 	<div class="col-md-1"></div>
 	<div class="col-md-2"><order-link order-by="Title" Input="@Model.Input">Titolo</order-link></div>
 	<div class="col-md-2"><order-link order-by="Author" Input="@Model.Input">Autore</order-link></div>
-	<div class="col-md-1"><order-link order-by="ReadingState" Input="@Model.Input">Stato</order-link></div>
 	<div class="col-md-2"><order-link order-by="Rating" Input="@Model.Input">Valutazione</order-link></div>
 	<div class="col-md-2"><order-link order-by="Tag" Input="@Model.Input">Tag</order-link></div>
+	<div class="col-md-1"><order-link order-by="ReadingState" Input="@Model.Input">Stato</order-link></div>
 	<div class="col-md-2"></div>
 </div>
-
-@foreach (BookViewModel book in Model.Books.Results)
-{
+	@foreach (BookViewModel book in Model.Books.Results)
+	{
 	<partial name="Books/_BookLine" model="@book"></partial>
+	}
 }
-@* TODO: se lungo 0 allora messaggio no libri *@
+else
+{
+	<p class="mt-3">Non hai ancora aggiunto nessun libro alla tua libreria.</p>
+}
 
 <vc:pagination-bar model="@Model"></vc:pagination-bar>

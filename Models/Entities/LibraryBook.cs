@@ -1,5 +1,6 @@
 
 using System;
+using Phrook.Customizations.ExtensionMethods;
 using Phrook.Models.Enums;
 using Phrook.Models.Services.Application;
 
@@ -50,7 +51,7 @@ namespace Phrook.Models.Entities
             {
             	throw new ArgumentException("This tag value isn't valid.");
             }
-            Tag = ((Tag)newTagIndex).ToString();
+            Tag = ((Tag)newTagIndex).GetDescription();
         }
 
 		public void ChangeReadingState(string s_newReadingStateIndex)
@@ -60,7 +61,7 @@ namespace Phrook.Models.Entities
             {
                 throw new ArgumentException("This reading state value isn't valid.");
             }
-            ReadingState = ((ReadingState)newReadingStateIndex).ToString();
+            ReadingState = ((ReadingState)newReadingStateIndex).GetDescription();
         }
 	}
 }

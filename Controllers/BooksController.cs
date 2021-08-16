@@ -109,13 +109,15 @@ namespace Phrook.Controllers
 			//TODO: mettere insieme i risultati delle due chiamate (prendere id unici)
 
 			List<SearchedBookViewModel> paginated = new();
-			//TODO: paginare
-			for(int i = 0; i < input.Limit; i++) {
-				if(i + input.Offset < books.Results.Count) {
-					bool isInLibrary = await _bookService.IsBookStoredInLibrary(books.Results[i].Id);
-					books.Results[i].IsInLibrary = isInLibrary;
-					paginated.Add(books.Results[i+input.Offset]);
-				}
+			// for(int i = 0; i < input.Limit; i++) {
+			// 	if(i + input.Offset < books.Results.Count) {
+			// 		paginated.Add(books.Results[i+input.Offset]);
+			// 	}
+			// }
+			foreach(var b in books.Results) 
+			{
+				bool isInLibrary = await _bookService.IsBookStoredInLibrary(b.Id);
+				b.IsInLibrary = isInLibrary;
 			}
 
 			var viewModel = new SearchBookListViewModel {

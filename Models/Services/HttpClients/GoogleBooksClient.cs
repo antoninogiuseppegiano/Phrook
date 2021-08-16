@@ -51,7 +51,20 @@ namespace Phrook.Models.Services.HttpClients
 		{
 			string url = googleBooksApiOptions.CurrentValue.Url;
 			//TODO: sanitization
-			return $"{url}?q=+intitle:{title}+inauthor:{author}&orderBy=relevance";
+			bool isTitle = !string.IsNullOrWhiteSpace(title);
+			bool isAuthor = !string.IsNullOrWhiteSpace(author);
+			if(isTitle && isAuthor) 
+			{
+				return $"{url}?q=+intitle:{title}+inauthor:{author}&orderBy=relevance";
+			}
+			else if(isTitle)
+			{
+				return $"{url}?q=+intitle:{title}&orderBy=relevance";
+			}
+			else 
+			{
+				return $"{url}?q=+inauthor:{author}&orderBy=relevance";
+			}
 		}
 
 		public async Task<BookOverviewViewModel> GetBookByIdAsync(string id)
