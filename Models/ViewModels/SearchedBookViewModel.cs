@@ -7,5 +7,6 @@ namespace Phrook.Models.ViewModels
 		public string Title { get; set; }
 		public string Author { get; set; }
 		public string ImagePath { get; set; }
+		public bool IsInLibrary { get; set; }
     }
 }

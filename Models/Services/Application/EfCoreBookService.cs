@@ -207,6 +207,7 @@ namespace Phrook.Models.Services.Application
 			}
 			LibraryBook book = await dbContext.LibraryBooks
 				.Where(librarybook => librarybook.UserId == userId && librarybook.BookId == inputModel.BookId)
+				.Include(libraryBook => libraryBook.Book)
 				.FirstOrDefaultAsync();
 
 			book.ChangeRating(inputModel.Rating);
@@ -339,9 +340,13 @@ namespace Phrook.Models.Services.Application
 			//int.TryParse(bookId, out int intId);
 
 			LibraryBook libraryBook;
-			if (!(await IsBookStoredInibrary(bookId)))
+			if (!(await IsBookStoredInLibrary(bookId)))
 			{
 				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
+				if(string.IsNullOrWhiteSpace(overview.Description))
+				{
+					overview.Description = "Nessuna descrizione";
+				}
 				Book book = new(overview.Id, overview.ISBN, overview.Title, overview.Author, overview.ImagePath, overview.Description);
 				dbContext.Add(book);
 				try
@@ -367,7 +372,7 @@ namespace Phrook.Models.Services.Application
 			}
 		}
 
-		private async Task<bool> IsBookStoredInibrary(string bookId)
+		public async Task<bool> IsBookStoredInLibrary(string bookId)
 		{
 			bool isStored = await dbContext.Books.AnyAsync(book => EF.Functions.Like(book.BookId, bookId));
 			return isStored;

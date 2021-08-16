@@ -112,6 +112,8 @@ namespace Phrook.Controllers
 			//TODO: paginare
 			for(int i = 0; i < input.Limit; i++) {
 				if(i + input.Offset < books.Results.Count) {
+					bool isInLibrary = await _bookService.IsBookStoredInLibrary(books.Results[i].Id);
+					books.Results[i].IsInLibrary = isInLibrary;
 					paginated.Add(books.Results[i+input.Offset]);
 				}
 			}
@@ -145,7 +147,7 @@ namespace Phrook.Controllers
 			if(book is not null)
 			{
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
-				return View("Detail", book);
+				return RedirectToAction(nameof(Detail), new { id = book.Id});
 			}
 			
 			string bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
@@ -157,6 +159,7 @@ namespace Phrook.Controllers
 			catch(ApiException) 
 			{
 				overviewViewModel = null;
+				throw new BookNotFoundException(searchISBN);
 			}
 
 			SearchBookViewModel viewModel =  new()  {
@@ -185,7 +188,7 @@ namespace Phrook.Controllers
 			if(book is not null) 
 			{
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
-				return View("Detail", book);
+				return RedirectToAction(nameof(Detail), new { id = id });
 			}
 
 			BookOverviewViewModel overviewViewModel;
