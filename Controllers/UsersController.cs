@@ -13,7 +13,6 @@ namespace Phrook.Controllers
 		public UsersController(IUserService userService)
 		{
 			this.userService = userService;
-
 		}
 		public async Task<IActionResult> Search(string searchUser)
 		{
@@ -26,7 +25,7 @@ namespace Phrook.Controllers
 
 			ListViewModel<SearchedUserViewModel> users = await userService.GetUsers(searchUser);
 
-			return Json(users.Results);
+			return View(users);
 		}
 	}
 }
