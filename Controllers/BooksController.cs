@@ -29,6 +29,8 @@ namespace Phrook.Controllers
 		{
 			ListViewModel<BookViewModel> books = await _bookService.GetBooksAsync(input);
 
+			ViewData["Filter"] = input.Search;
+
 			BookListViewModel viewModel = new()
 			{
 				Books = books,
@@ -92,6 +94,10 @@ namespace Phrook.Controllers
 				throw new InvalidApiInputException(input.SearchTitle, input.SearchAuthor);
 			}
 
+			ViewData["SearchTitle"] = input.SearchTitle;
+			ViewData["SearchAuthor"] = input.SearchAuthor;
+			//ViewData["SearchISBN"] = input.SearchISBN;
+
 			ListViewModel<SearchedBookViewModel> books;
 
 			//TODO: chiamare servizio che cerca tra i libri posseduti dall'utente in db  ????
@@ -108,7 +114,7 @@ namespace Phrook.Controllers
 
 			//TODO: mettere insieme i risultati delle due chiamate (prendere id unici)
 
-			List<SearchedBookViewModel> paginated = new();
+			//List<SearchedBookViewModel> paginated = new();
 			// for(int i = 0; i < input.Limit; i++) {
 			// 	if(i + input.Offset < books.Results.Count) {
 			// 		paginated.Add(books.Results[i+input.Offset]);
@@ -134,6 +140,10 @@ namespace Phrook.Controllers
 			{
 				throw new InvalidApiInputException(searchISBN);
 			}
+
+			// ViewData["SearchTitle"] = input.SearchTitle;
+			// ViewData["SearchAuthor"] = input.SearchAuthor;
+			ViewData["SearchISBN"] = searchISBN;
 
 			//TODO: se non appartiene all'utente
 			BookDetailViewModel book;

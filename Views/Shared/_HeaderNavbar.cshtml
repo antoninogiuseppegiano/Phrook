@@ -9,9 +9,9 @@
 			<div class="d-flex align-items-center">
 				<form asp-controller="Books" asp-action="Search" method="get">
 					<div class="input-group">
-						<input type="text" name="searchTitle" class="form-control" placeholder="Cerca titolo" @* value="" @Model.Input.Search *@>
+						<input type="text" name="searchTitle" class="form-control" placeholder="Cerca titolo" value="@ViewData["SearchTitle"]">
 						<div class="input-group-append">
-							<input type="text" name="searchAuthor" class="form-control" placeholder="Cerca autore" @* value="" @Model.Input.Search *@>
+							<input type="text" name="searchAuthor" class="form-control" placeholder="Cerca autore" value="@ViewData["SearchAuthor"]">
 						</div>
 						<div class="input-group-append">
 							<button><i class="input-group-text fas fa-search"></i></button>
@@ -24,7 +24,7 @@
 			<div class="d-flex align-items-center">
 				<form asp-controller="Books" asp-action="OverviewByISBN" method="get">
 					<div class="input-group">
-						<input type="text" name="searchISBN" class="form-control" placeholder="Cerca ISBN" value=""@* @Model.Input.Search *@>
+						<input type="text" name="searchISBN" class="form-control" placeholder="Cerca ISBN" value="@ViewData["SearchISBN"]">
 						<div class="input-group-append">
 							<button><i class="input-group-text fas fa-search"></i></button>
 						</div>

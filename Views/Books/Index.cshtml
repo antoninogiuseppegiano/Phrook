@@ -7,7 +7,7 @@
 	<div class="col-md-4 d-flex align-items-center">
 		<form asp-controller="Books" asp-action="Index" method="get">
 			<div class="input-group">
-				<input type="text" name="search" class="form-control" placeholder="Cerca nella tua libreria" value="@Model.Input.Search">
+				<input type="text" name="search" class="form-control" placeholder="Cerca nella tua libreria" value="@ViewData["Filter"]">
 				<div class="input-group-append">
 					<button><i class="input-group-text fas fa-search"></i></button>
 				</div>
