@@ -7,11 +7,13 @@
     <div class="row">
 		<div class="col-md-3">
             <aside>
+				@if(book.IsInLibrary)
+				{
 				<form method="post" asp-controller="Books" asp-action="AddToLibrary">
 					<input type="hidden" asp-for="Book.Id">
 					<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
 				</form>
-				
+				}
                 <img src="@book.ImagePath" class="img-fluid course-image" alt="@book.Title">
 			</aside>
         </div>
@@ -23,7 +25,7 @@
 			</div>
 			<div class="row">
 				@* TODO: controllare description vuote *@
-				<p>@book.Description</p>
+				<p>@Html.Raw(book.Description)</p>
 			</div>
         </div>
     </div>

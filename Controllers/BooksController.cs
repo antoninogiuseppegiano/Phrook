@@ -162,6 +162,8 @@ namespace Phrook.Controllers
 				throw new BookNotFoundException(searchISBN);
 			}
 
+			bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
+			overviewViewModel.IsInLibrary = isInLibrary;
 			SearchBookViewModel viewModel =  new()  {
 				Book = overviewViewModel,
 				Search = searchISBN
@@ -203,6 +205,8 @@ namespace Phrook.Controllers
 
 			if(overviewViewModel is not null) 
 			{
+				bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
+				overviewViewModel.IsInLibrary = isInLibrary;
 				var viewModel = new SearchBookViewModel
 				{
 					Book = overviewViewModel,
