@@ -27,7 +27,12 @@ namespace Phrook.Models.Services.Application
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IGoogleBooksClient _gbClient;
 
-		public EfCoreBookService(IGoogleBooksClient googleBooksClient, IHttpContextAccessor httpContextAccessor, PhrookDbContext dbContext, IOptionsMonitor<BooksOptions> booksOptions, ILogger<EfCoreBookService> logger)
+		public EfCoreBookService(
+			IGoogleBooksClient googleBooksClient,
+			IHttpContextAccessor httpContextAccessor,
+			PhrookDbContext dbContext,
+			IOptionsMonitor<BooksOptions> booksOptions,
+			ILogger<EfCoreBookService> logger)
 		{
 			this._gbClient = googleBooksClient;
 			this.httpContextAccessor = httpContextAccessor;
@@ -83,7 +88,7 @@ namespace Phrook.Models.Services.Application
 		public async Task<ListViewModel<BookViewModel>> GetBooksAsync(BookListInputModel model)
 		{
 			logger.LogInformation("Book list requested.");
-
+			model.Search = model.Search?.Trim();
 			//Ricerca
 			IQueryable<LibraryBook> baseQuery = dbContext.LibraryBooks;
 
@@ -121,10 +126,11 @@ namespace Phrook.Models.Services.Application
 				throw new UserUnknownException();
 			}
 
+			string searchString = model.Search.ToLower();
 			IQueryable<BookViewModel> query = baseQuery
 			.AsNoTracking()
 			//TODO: implementare fuzzy
-			.Where(libraryBook => libraryBook.UserId == userId && libraryBook.Book.Title.Contains(model.Search))
+			.Where(libraryBook => libraryBook.UserId == userId && libraryBook.Book.NormalizedTitle.Contains(searchString))
 			.Select(libraryBook =>
 			new BookViewModel
 			{
@@ -144,7 +150,7 @@ namespace Phrook.Models.Services.Application
 			.ToListAsync();
 
 			int totalCount = await query.CountAsync();
-			ListViewModel<BookViewModel> result = new ListViewModel<BookViewModel>
+			ListViewModel<BookViewModel> result = new ()
 			{
 				Results = books,
 				TotalCount = totalCount

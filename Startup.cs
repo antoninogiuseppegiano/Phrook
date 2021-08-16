@@ -53,6 +53,7 @@ namespace Phrook
 				options.Filters.Add(filter);
 			});
 			services.AddTransient<IBookService, EfCoreBookService>();
+			services.AddTransient<IUserService, EfCoreUserService>();
 			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
 			
 			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>

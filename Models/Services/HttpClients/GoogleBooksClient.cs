@@ -112,6 +112,8 @@ namespace Phrook.Models.Services.HttpClients
 		{
 			try
 			{
+				title = title?.Trim();
+				author = author?.Trim();
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(title, author));
 				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream);
 				ListViewModel<SearchedBookViewModel> viewModel = new() { Results = new() };

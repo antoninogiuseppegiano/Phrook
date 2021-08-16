@@ -1,0 +1,22 @@
+@page
+@model VisibilityModel
+@{
+    ViewData["Title"] = "Visibilità";@* Profile *@
+    ViewData["ActivePage"] = ManageNavPages.Visibility;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<p>Spuntando la cassella gli altri utenti del sito potranno consultare la tua libreria attraverso la ricerca. Potrai cambiare questa impostazione in qualsiasi momento.</p>
+<p>Vuoi rendere il tuo profilo visibile?</p>
+<form id="visibility-form" method="post">
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="form-group">
+		<label asp-for="Input.Visibility"></label>
+		<input asp-for="Input.Visibility" onchange="document.getElementById('visibility-form').submit()" />
+	</div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

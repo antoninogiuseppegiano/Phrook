@@ -83,6 +83,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             {
                 // var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FullName = Input.FullName };
+				user.NormalizedFullName = user.FullName.ToLower();
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

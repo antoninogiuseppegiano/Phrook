@@ -89,14 +89,15 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Search(SearchApiInputModel input)
 		{
-			if (string.IsNullOrEmpty(input.SearchTitle + input.SearchAuthor))
-			{
-				throw new InvalidApiInputException(input.SearchTitle, input.SearchAuthor);
-			}
-
 			ViewData["SearchTitle"] = input.SearchTitle;
 			ViewData["SearchAuthor"] = input.SearchAuthor;
-			//ViewData["SearchISBN"] = input.SearchISBN;
+			if (string.IsNullOrWhiteSpace(input.SearchTitle + input.SearchAuthor))
+			{
+				//throw new InvalidApiInputException(input.SearchTitle, input.SearchAuthor);
+				return Redirect(Request.GetTypedHeaders().Referer.ToString());
+			}
+
+			
 
 			ListViewModel<SearchedBookViewModel> books;
 
@@ -136,16 +137,13 @@ namespace Phrook.Controllers
 		
 		public async Task<IActionResult> OverviewByISBN(string searchISBN)
 		{
-			if (string.IsNullOrEmpty(searchISBN) || !long.TryParse(searchISBN, out _))
-			{
-				throw new InvalidApiInputException(searchISBN);
-			}
-
-			// ViewData["SearchTitle"] = input.SearchTitle;
-			// ViewData["SearchAuthor"] = input.SearchAuthor;
 			ViewData["SearchISBN"] = searchISBN;
+			if (string.IsNullOrWhiteSpace(searchISBN) || !long.TryParse(searchISBN, out _))
+			{
+				//throw new InvalidApiInputException(searchISBN);
+				return Redirect(Request.GetTypedHeaders().Referer.ToString());
+			}			
 
-			//TODO: se non appartiene all'utente
 			BookDetailViewModel book;
 			try
 			{
@@ -186,7 +184,7 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> OverviewById(string id)
 		{
-			if (string.IsNullOrEmpty(id))
+			if (string.IsNullOrWhiteSpace(id))
 			{
 				throw new InvalidApiInputException(id);
 			}

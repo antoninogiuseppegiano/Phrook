@@ -25,7 +25,7 @@ namespace Phrook.Models.InputModels
 			this.Limit = Math.Max(1, limit);
 			this.Offset = (Page - 1) * this.Limit;
 		}
-		public string Search { get; }
+		public string Search { get; set; }
 		public int Page { get; }
 		public string OrderBy { get; }
 		public bool Ascending { get; }

@@ -21,10 +21,13 @@ namespace Phrook.Areas.Identity.Pages.Account.Manage
         public static string ExternalLogins => "ExternalLogins";
 
         public static string PersonalData => "PersonalData";
+        public static string Visibility => "Visibility";
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+        
+		public static string VisibilityNavClass(ViewContext viewContext) => PageNavClass(viewContext, Visibility);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
 

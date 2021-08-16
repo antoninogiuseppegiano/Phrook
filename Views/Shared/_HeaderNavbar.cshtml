@@ -32,6 +32,18 @@
 				</form>
 			</div>
 		</li>
+		<li class="nav-item ms-3">
+			<div class="d-flex align-items-center">
+				<form asp-controller="Users" asp-action="Search" method="get">
+					<div class="input-group">
+						<input type="text" name="searchUser" class="form-control" placeholder="Cerca profilo" value="@ViewData["SearchUser"]">
+						<div class="input-group-append">
+							<button><i class="input-group-text fas fa-search"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</li>
 	</ul>
 	<partial name="_LoginPartial"></partial>
 </div>

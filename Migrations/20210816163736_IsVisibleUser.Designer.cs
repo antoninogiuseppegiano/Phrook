@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Phrook.Models.Services.Infrastructure;
 
 namespace Phrook.Migrations
 {
     [DbContext(typeof(PhrookDbContext))]
-    partial class PhrookDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210816163736_IsVisibleUser")]
+    partial class IsVisibleUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,9 +182,6 @@ namespace Phrook.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NormalizedFullName")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -241,9 +240,6 @@ namespace Phrook.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Isbn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedTitle")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
