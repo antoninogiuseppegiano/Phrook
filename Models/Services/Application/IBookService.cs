@@ -13,5 +13,6 @@ namespace Phrook.Models.Services.Application
 		Task<BookDetailViewModel> EditBookAsync(EditBookInputModel inputModel);
 		Task<EditBookInputModel> GetBookForEditingAsync(string id);
 		Task RemoveBookFromLibrary(string id);
+		Task AddBookToLibrary(string id);
 	}
 }

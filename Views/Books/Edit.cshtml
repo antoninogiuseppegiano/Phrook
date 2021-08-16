@@ -15,7 +15,7 @@
 		<div class="row">
             <div class="col-12" asp-validation-summary="All"></div>
         </div>
-		<input type="hidden" asp-for="Id">
+		<input type="hidden" asp-for="BookId">
 		<div class="row">
             <div class="col-md-9">
                 <div class="form-group">
@@ -45,7 +45,7 @@
             </div>
         </div>
 	</form>
-	<form method="post" asp-action="Delete" aspr-route-id="@Model.Id">
+	<form method="post" asp-action="Delete" aspr-route-id="@Model.BookId">
 		<div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-title" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -58,7 +58,7 @@
 				</div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-					<button type="submit" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Conferma</button>
+					<button type="submit" asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger">Conferma</button>
 				</div>
 				</div>
 			</div>

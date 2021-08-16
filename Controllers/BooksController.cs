@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Phrook.Models.Exceptions;
 using Phrook.Models.InputModels;
@@ -34,7 +35,6 @@ namespace Phrook.Controllers
 				Input = input
 			};
 
-			//return the view /views/Books/Index
 			ViewData["Title"] = "Libreria";
 			return View(viewModel);
 		}
@@ -60,13 +60,13 @@ namespace Phrook.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Edit(EditBookInputModel inputModel) 
 		{
-			if(!ModelState.IsValid)
+			if(ModelState.IsValid)
 			{
 				try
 				{
 					BookDetailViewModel book = await _bookService.EditBookAsync(inputModel);
 					TempData["ConfirmationMessage"] = "Campi aggiornati correttamente.";
-					return RedirectToAction(nameof(Detail), new { id = inputModel.Id });
+					return RedirectToAction(nameof(Detail), new { id = inputModel.BookId });
 				}
 				catch (OptimisticConcurrencyException)
 				{
@@ -167,7 +167,7 @@ namespace Phrook.Controllers
 			return View("Overview", viewModel);
 		}
 
-		public async Task<IActionResult> OverviewById([FromQuery] string id)
+		public async Task<IActionResult> OverviewById(string id)
 		{
 			if (string.IsNullOrEmpty(id))
 			{
@@ -187,7 +187,7 @@ namespace Phrook.Controllers
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
 				return View("Detail", book);
 			}
-			
+
 			BookOverviewViewModel overviewViewModel;
 			try 
 			{
@@ -195,7 +195,7 @@ namespace Phrook.Controllers
 			}
 			catch(ApiException) 
 			{
-				throw new BookNotFoundException(int.Parse(id));
+				throw new BookNotFoundException(id);
 			}
 
 			if(overviewViewModel is not null) 
@@ -210,10 +210,25 @@ namespace Phrook.Controllers
 			}
 			else
 			{
-				throw new BookNotFoundException(int.Parse(id));
+				throw new BookNotFoundException(id);
 			}
 			
 			
+		}
+
+		public async Task<IActionResult> AddToLibrary(string id) 
+		{
+			try
+			{
+				await _bookService.AddBookToLibrary(id);
+			}
+			catch
+			{
+				TempData["ErrorMessage"] = "Non è stato possibile aggiungere il libro dalla libreria.";
+				return Redirect(Request.GetTypedHeaders().Referer.ToString());
+			}
+			TempData["ConfirmationMessage"] = "Libro aggiunto alla libreria.";
+			return RedirectToAction(nameof(Index));
 		}
 	
 		public async Task<IActionResult> Delete(string id)

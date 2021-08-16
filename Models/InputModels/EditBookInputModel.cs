@@ -10,7 +10,7 @@ namespace Phrook.Models.InputModels
 	public class EditBookInputModel : IValidatableObject
 	{
 		// [Required]
-		public int Id { get; set; }
+		public string BookId { get; set; }
 
 		// [Required]
 		public string Title { get; set; }

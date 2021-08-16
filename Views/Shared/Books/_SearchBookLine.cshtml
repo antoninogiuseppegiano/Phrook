@@ -13,9 +13,12 @@
 		@Model.ISBN
 	</div>
 	<div class="col-md-2 d-flex align-items-center">
-		<a class="btn btn-outline-primary" asp-action="AddToLibrary" asp-route-id="@Model.Id">Aggiungi alla libreria</a>  
+		<form method="post" asp-controller="Books" asp-action="AddToLibrary">
+			<input type="hidden" asp-for="Id">
+			<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
+		</form>
 	</div>
 	<div class="col-md-2 d-flex align-items-center">
-		<a class="btn btn-outline-primary" asp-action="Overview" asp-route-id="@Model.Id">Panoramica</a>  
+		<a class="btn btn-outline-primary" asp-action="OverviewById" asp-route-id="@Model.Id">Panoramica</a>  
 	</div>
 </div>

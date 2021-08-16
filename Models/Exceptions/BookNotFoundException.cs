@@ -8,7 +8,6 @@ namespace Phrook.Models.Exceptions
 		{
 		}
 
-		public BookNotFoundException(int id) : base($"Book {id} not found"){}
-        public BookNotFoundException(string ISBN) : base($"Book {ISBN} not found"){}
+		public BookNotFoundException(string value) : base($"Book {value} not found"){}
     }
 }

@@ -7,7 +7,11 @@
     <div class="row">
 		<div class="col-md-3">
             <aside>
-				@* <a href="#" class="btn btn-warning btn-lg btn-block button-book">Button</a> *@
+				<form method="post" asp-controller="Books" asp-action="AddToLibrary">
+					<input type="hidden" asp-for="Book.Id">
+					<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
+				</form>
+				
                 <img src="@book.ImagePath" class="img-fluid course-image" alt="@book.Title">
 			</aside>
         </div>

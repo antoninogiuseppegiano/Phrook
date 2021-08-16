@@ -9,7 +9,7 @@ namespace Phrook.Models.Entities
 {
 	public partial class LibraryBook
 	{
-		public LibraryBook(int bookId, string userId)
+		public LibraryBook(string bookId, string userId)
         {
 			//TODO: validazione bookId e userId
 		    /* if ()
@@ -23,9 +23,10 @@ namespace Phrook.Models.Entities
             BookId = bookId;
             UserId = userId;
         }
+
 		public int Id { get; private set; }
 		public virtual Book Book { get; set; }
-        public int BookId { get; set; }
+        public string BookId { get; set; }
 		public virtual ApplicationUser User { get; set; }
         public string UserId { get; set; }
 		public double Rating { get; private set; }

@@ -11,6 +11,7 @@ using Phrook.Models.Entities;
 using Phrook.Models.Exceptions;
 using Phrook.Models.InputModels;
 using Phrook.Models.Options;
+using Phrook.Models.Services.HttpClients;
 using Phrook.Models.Services.Infrastructure;
 using Phrook.Models.ViewModels;
 using Z.EntityFramework.Plus;
@@ -24,9 +25,11 @@ namespace Phrook.Models.Services.Application
 		private readonly IOptionsMonitor<BooksOptions> booksOptions;
 		private readonly ILogger<EfCoreBookService> logger;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly IGoogleBooksClient _gbClient;
 
-		public EfCoreBookService(IHttpContextAccessor httpContextAccessor, PhrookDbContext dbContext, IOptionsMonitor<BooksOptions> booksOptions, ILogger<EfCoreBookService> logger)
+		public EfCoreBookService(IGoogleBooksClient googleBooksClient, IHttpContextAccessor httpContextAccessor, PhrookDbContext dbContext, IOptionsMonitor<BooksOptions> booksOptions, ILogger<EfCoreBookService> logger)
 		{
+			this._gbClient = googleBooksClient;
 			this.httpContextAccessor = httpContextAccessor;
 			this.logger = logger;
 			this.booksOptions = booksOptions;
@@ -39,7 +42,7 @@ namespace Phrook.Models.Services.Application
 			BookDetailViewModel book;
 			try
 			{
-				int.TryParse(id, out int intId);
+				//int.TryParse(id, out int intId);
 				string userId = "";
 				try
 				{
@@ -52,7 +55,7 @@ namespace Phrook.Models.Services.Application
 
 				var query = dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(libraryBook => libraryBook.BookId == intId && libraryBook.UserId == userId)
+				.Where(libraryBook => libraryBook.BookId == id && libraryBook.UserId == userId)
 				.Select(libraryBook =>
 				new BookDetailViewModel
 				{
@@ -125,7 +128,7 @@ namespace Phrook.Models.Services.Application
 			.Select(libraryBook =>
 			new BookViewModel
 			{
-				Id = libraryBook.Book.Id,
+				Id = libraryBook.BookId,
 				ISBN = libraryBook.Book.Isbn,
 				Title = libraryBook.Book.Title,
 				Author = libraryBook.Book.Author,
@@ -151,7 +154,7 @@ namespace Phrook.Models.Services.Application
 
 		public async Task<BookDetailViewModel> GetBookByISBNAsync(string ISBN)
 		{
-			logger.LogInformation("Book id: {ISBN} requested.", ISBN);
+			logger.LogInformation("Book ISBN: {ISBN} requested.", ISBN);
 			string userId = "";
 			try
 			{
@@ -203,7 +206,7 @@ namespace Phrook.Models.Services.Application
 				throw new UserUnknownException();
 			}
 			LibraryBook book = await dbContext.LibraryBooks
-				.Where(librarybook => librarybook.UserId == userId && librarybook.BookId == inputModel.Id)
+				.Where(librarybook => librarybook.UserId == userId && librarybook.BookId == inputModel.BookId)
 				.FirstOrDefaultAsync();
 
 			book.ChangeRating(inputModel.Rating);
@@ -254,15 +257,14 @@ namespace Phrook.Models.Services.Application
 			IQueryable<EditBookInputModel> query;
 			try
 			{
-				int.TryParse(id, out int intId);
+				//int.TryParse(id, out int intId);
 				query = dbContext.LibraryBooks
 				.AsNoTracking()
-				//TODO: implementare fuzzy
-				.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == intId)
+				.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == id)
 				.Select(librarybook =>
 				new EditBookInputModel
 				{
-					Id = librarybook.BookId,
+					BookId = librarybook.BookId,
 					Title = librarybook.Book.Title,
 
 					Rating = librarybook.Rating,
@@ -276,12 +278,11 @@ namespace Phrook.Models.Services.Application
 			}
 			catch (InvalidOperationException)
 			{
-				int.TryParse(id, out int intId);
-				throw new BookNotFoundException(intId);
+				throw new BookNotFoundException(id);
 			}
 		}
 
-		public async Task RemoveBookFromLibrary(string id)
+		public async Task RemoveBookFromLibrary(string bookId)
 		{
 			string userId = "";
 			try
@@ -292,8 +293,8 @@ namespace Phrook.Models.Services.Application
 			{
 				throw new UserUnknownException();
 			}
-			int.TryParse(id, out int intId);
-			int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == userId  && libraryBook.BookId == intId).DeleteAsync();
+			// int.TryParse(id, out int intId);
+			int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == bookId).DeleteAsync();
 			if (affectedRows is 1)
 			{
 				await dbContext.SaveChangesAsync();
@@ -309,7 +310,7 @@ namespace Phrook.Models.Services.Application
 
 			//TODO: Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
 			// eliminazione dal db con EF Core PLUS
-			// int affectedRows = await dbContext.Books.Where(book =>  book.Id == intId).DeleteAsync();
+			// int affectedRows = await dbContext.Books.Where(book =>  book.Id == id).DeleteAsync();
 			// if (affectedRows is 1)
 			// {
 			// 	await dbContext.SaveChangesAsync();
@@ -324,6 +325,52 @@ namespace Phrook.Models.Services.Application
 			// }
 		}
 
-		
+		public async Task AddBookToLibrary(string bookId)
+		{
+			string userId = "";
+			try
+			{
+				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			//int.TryParse(bookId, out int intId);
+
+			LibraryBook libraryBook;
+			if (!(await IsBookStoredInibrary(bookId)))
+			{
+				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
+				Book book = new(overview.Id, overview.ISBN, overview.Title, overview.Author, overview.ImagePath, overview.Description);
+				dbContext.Add(book);
+				try
+				{
+					await dbContext.SaveChangesAsync();
+				}
+				catch (DbUpdateException)
+				{
+					throw new BookNotAddedException(bookId);
+				}
+			}
+
+			libraryBook = new(bookId, userId);
+
+			dbContext.Add(libraryBook);
+			try
+			{
+				await dbContext.SaveChangesAsync();
+			}
+			catch (DbUpdateException)
+			{
+				throw new BookNotAddedException(bookId);
+			}
+		}
+
+		private async Task<bool> IsBookStoredInibrary(string bookId)
+		{
+			bool isStored = await dbContext.Books.AnyAsync(book => EF.Functions.Like(book.BookId, bookId));
+			return isStored;
+		}
 	}
 }
