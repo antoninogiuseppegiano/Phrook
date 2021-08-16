@@ -28,11 +28,13 @@ namespace Phrook.Models.InputModels
 
 		public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 		{
-			if (!Enum.IsDefined(typeof(Tag), Tag))
+			int.TryParse(Tag, out int intTag);
+			int.TryParse(ReadingState, out int intRS);
+			if (!Enum.IsDefined(typeof(Tag), intTag))
 			{
 				yield return new ValidationResult("Il tag non è accetabile.", new[] { nameof(Tag) });
 			}
-			if (!Enum.IsDefined(typeof(ReadingState), ReadingState))
+			if (!Enum.IsDefined(typeof(ReadingState), intRS))
 			{
 				yield return new ValidationResult("Lo stato non è accetabile.", new[] { nameof(ReadingState) });
 			}

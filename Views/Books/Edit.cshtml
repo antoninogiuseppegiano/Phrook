@@ -70,5 +70,31 @@
 @section Scripts
 {
 	<partial name="_Validation"></partial>
+	<script>
+		function setSelect(selectId, stringValue) {
+			let select, opt; 
+			select = document.getElementById(selectId);
+			if(stringValue == null) {
+				opt = document.createElement('option');
+				opt.value = '--Scegli--';
+				opt.innerHTML = '--Scegli--';
+				opt.disabled = true;
+				opt.selected = true;
+				select.appendChild(opt);
+			}
+			else 
+			{
+				opt = document.getElementsByTagName('option');
+				for(let i = 0; i < opt.length; i++) {
+					if(opt[i].innerHTML == stringValue) {
+						opt[i].selected = true;
+						break;
+					}
+				}
+			}
+		};
+		setSelect('Tag', '@(Model.Tag)')
+		setSelect('ReadingState', '@(Model.ReadingState)')
+	</script>
 }
 

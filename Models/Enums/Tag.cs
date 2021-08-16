@@ -5,7 +5,6 @@ namespace Phrook.Models.Enums
         Narrativa,
 		Saggistica,
 		Giallo,
-		Fantascienza,
-		NoTagYet
+		Fantascienza
     }
 }

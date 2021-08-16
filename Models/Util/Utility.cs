@@ -11,7 +11,7 @@ namespace Phrook.Models.Util
 			}
 			else
 			{
-				newTitle = title.Substring(0, maxChar);
+				newTitle = title;
 			}
 			return newTitle;
 		}
