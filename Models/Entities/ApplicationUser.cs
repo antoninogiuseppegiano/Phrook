@@ -8,6 +8,7 @@ namespace Phrook.Models.Entities
         public string FullName { get; set; }
         public string NormalizedFullName { get; set; }
 		public bool Visibility { get; set; }
+		public virtual ICollection<Wishlist> Whishes { get; set; }
 		public virtual ICollection<LibraryBook> Library { get; set; }
     }
 }

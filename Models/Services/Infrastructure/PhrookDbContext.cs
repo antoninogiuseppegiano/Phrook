@@ -77,6 +77,27 @@ namespace Phrook.Models.Services.Infrastructure
 					.HasForeignKey(libraryBook => libraryBook.BookId);
             });
 
+			modelBuilder.Entity<Wishlist>(entity =>
+            {
+				entity.ToTable("Wishlists");
+				entity.HasKey(wishlist => wishlist.Id); //unnecessary
+				entity.HasIndex(wishlist => new { wishlist.UserId, wishlist.BookId }).IsUnique();
+
+                entity.Property(e => e.UserId).HasColumnType("TEXT");
+                entity.Property(e => e.BookId).HasColumnType("TEXT");
+                entity.Property(e => e.Isbn).HasColumnType("TEXT");
+                entity.Property(e => e.Title).HasColumnType("TEXT");
+                entity.Property(e => e.NormalizedTitle).HasColumnType("TEXT");
+                entity.Property(e => e.ImagePath).HasColumnType("TEXT");
+                entity.Property(e => e.Author).HasColumnType("TEXT");
+
+				entity.HasOne(wishlist => wishlist.User)
+					.WithMany(user => user.Whishes)
+					.HasForeignKey(wishlist => wishlist.UserId);
+
+            });
+
+
             OnModelCreatingPartial(modelBuilder);
         }
 
