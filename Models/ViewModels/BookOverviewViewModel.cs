@@ -9,5 +9,6 @@ namespace Phrook.Models.ViewModels
 		public string ImagePath { get; set; }
 		public string Description { get; set; }
 		public bool IsInLibrary { get; set; }
+		public bool IsInWishlist { get; set; }
     }
 }

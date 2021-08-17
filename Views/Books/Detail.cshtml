@@ -14,12 +14,12 @@
         </div>
         <div class="col-md-3">
             <aside class=" d-flex flex-column align-items-center">
-                <img src="@Model.ImagePath" class="img-fluid book-image" alt="@Model.Title">
+                <img src="@Model.ImagePath" class="img-fluid book-image mb-3" alt="@Model.Title">
 				<div class="rating d-flex justify-content-center" title="@Model.Rating">
                     <rating value="@Model.Rating"></rating>
                 </div>
-				<p><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></o> 
-				<a class="btn btn-outline-primary btn-sm mt-3" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
+				<p class="mb-1"><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></p> 
+				<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
 			</aside>
         </div>
     </div>

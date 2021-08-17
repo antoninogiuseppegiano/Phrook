@@ -54,6 +54,7 @@ namespace Phrook
 			});
 			services.AddTransient<IBookService, EfCoreBookService>();
 			services.AddTransient<IUserService, EfCoreUserService>();
+			services.AddTransient<IWishlistService, EfCoreWishlistService>();
 			services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
 			
 			services.AddDbContextPool<PhrookDbContext>(optionsBuilder =>

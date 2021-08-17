@@ -39,9 +39,9 @@ namespace Phrook.Models.Entities
 		
 		public void ChangeRating(double newRating)
         {
-            if (newRating < 0.1 || newRating > 5)
+            if (newRating < 0 || newRating > 5)
             {
-                throw new ArgumentException("The rating must be between 0.1 and 5.");
+                throw new ArgumentException("The rating must be between 0 and 5.");
             }
             Rating = newRating;
         }

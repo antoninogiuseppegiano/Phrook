@@ -174,6 +174,8 @@ namespace Phrook.Controllers
 
 			bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
 			overviewViewModel.IsInLibrary = isInLibrary;
+			bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+			overviewViewModel.IsInWishlist = isInWishlist;
 			SearchBookViewModel viewModel =  new()  {
 				Book = overviewViewModel,
 				Search = searchISBN
@@ -217,6 +219,8 @@ namespace Phrook.Controllers
 			{
 				bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
 				overviewViewModel.IsInLibrary = isInLibrary;
+				bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+				overviewViewModel.IsInWishlist = isInWishlist;
 				var viewModel = new SearchBookViewModel
 				{
 					Book = overviewViewModel,

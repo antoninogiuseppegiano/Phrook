@@ -15,5 +15,6 @@ namespace Phrook.Models.Services.Application
 		Task RemoveBookFromLibrary(string id);
 		Task AddBookToLibrary(string id);
 		Task<bool> IsBookStoredInLibrary(string id);
+		Task<bool> IsBookInWishList(string bookId);
 	}
 }

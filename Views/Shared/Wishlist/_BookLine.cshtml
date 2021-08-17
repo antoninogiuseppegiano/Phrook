@@ -1,0 +1,20 @@
+@model WishlistViewModel
+
+<hr>
+<div class="row book-library">
+    <div class="col-md-2">
+        <img src="@Model.ImagePath" width="52" height="52">
+    </div>
+    <div class="col-md-3">
+        <h2>@Model.Title</h2>
+    </div>
+    <div class="col-md-3">
+        <author>@Model.Author</author>
+    </div>
+	<div class="col-md-2 d-flex">
+		<p>@Model.Isbn</p>
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+      <a class="btn btn-danger btn-lg" asp-controller="Wishlist" asp-action="Delete" asp-route-bookId="@Model.BookId"><i class="fas fa-trash-alt"></i></a>  
+    </div>
+</div>

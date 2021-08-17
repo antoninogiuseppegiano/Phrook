@@ -315,21 +315,26 @@ namespace Phrook.Models.Services.Application
 				throw new TooManyRowsException(affectedRows);
 			}
 
-			//TODO: Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
+			//Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
 			// eliminazione dal db con EF Core PLUS
-			// int affectedRows = await dbContext.Books.Where(book =>  book.Id == id).DeleteAsync();
-			// if (affectedRows is 1)
-			// {
-			// 	await dbContext.SaveChangesAsync();
-			// }
-			// else if (affectedRows is 0)
-			// {
-			// 	throw new BookNotFoundException();
-			// }
-			// else
-			// {
-			// 	throw new TooManyRowsException(affectedRows);
-			// }
+			bool isStillInLibrary = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.BookId == bookId).CountAsync() > 0;
+			if(!isStillInLibrary)
+			{
+				affectedRows = await dbContext.Books.Where(book =>  book.BookId == bookId).DeleteAsync();
+				if (affectedRows is 1)
+				{
+					await dbContext.SaveChangesAsync();
+				}
+				else if (affectedRows is 0)
+				{
+					throw new BookNotFoundException();
+				}
+				else
+				{
+					throw new TooManyRowsException(affectedRows);
+				}
+			}
+			
 		}
 
 		public async Task AddBookToLibrary(string bookId)
@@ -355,14 +360,14 @@ namespace Phrook.Models.Services.Application
 				}
 				Book book = new(overview.Id, overview.ISBN, overview.Title, overview.Author, overview.ImagePath, overview.Description);
 				dbContext.Add(book);
-				try
-				{
-					await dbContext.SaveChangesAsync();
-				}
-				catch (DbUpdateException)
-				{
-					throw new BookNotAddedException(bookId);
-				}
+				// try
+				// {
+				// 	await dbContext.SaveChangesAsync();
+				// }
+				// catch (DbUpdateException)
+				// {
+				// 	throw new BookNotAddedException(bookId);
+				// }
 			}
 
 			libraryBook = new(bookId, userId);
@@ -376,11 +381,37 @@ namespace Phrook.Models.Services.Application
 			{
 				throw new BookNotAddedException(bookId);
 			}
+
+			//Removing from wishlist
+			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == userId).DeleteAsync();
+			if (affectedRows is 1)
+			{
+				await dbContext.SaveChangesAsync();
+			}
+			else if( affectedRows > 1)
+			{
+				throw new TooManyRowsException(affectedRows);
+			}
 		}
 
 		public async Task<bool> IsBookStoredInLibrary(string bookId)
 		{
 			bool isStored = await dbContext.Books.AnyAsync(book => EF.Functions.Like(book.BookId, bookId));
+			return isStored;
+		}
+
+		public async Task<bool> IsBookInWishList(string bookId)
+		{
+			string userId = "";
+			try
+			{
+				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			bool isStored = await dbContext.Wishlist.AnyAsync(book => EF.Functions.Like(book.BookId, bookId) && EF.Functions.Like(book.UserId, userId));
 			return isStored;
 		}
 	}

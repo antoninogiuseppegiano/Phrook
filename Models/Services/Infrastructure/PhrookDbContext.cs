@@ -17,6 +17,7 @@ namespace Phrook.Models.Services.Infrastructure
 
         public virtual DbSet<Book> Books { get; set; }
         public virtual DbSet<LibraryBook> LibraryBooks { get; set; }
+        public virtual DbSet<Wishlist> Wishlist { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
