@@ -241,7 +241,7 @@ namespace Phrook.Controllers
 			}
 			catch
 			{
-				TempData["ErrorMessage"] = "Non è stato possibile aggiungere il libro dalla libreria.";
+				TempData["ErrorMessage"] = "Non è stato possibile aggiungere il libro alla libreria.";
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
 			TempData["ConfirmationMessage"] = "Libro aggiunto alla libreria.";
