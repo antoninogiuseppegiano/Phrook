@@ -18,8 +18,8 @@
 				<div class="rating d-flex justify-content-center" title="@Model.Rating">
                     <rating value="@Model.Rating"></rating>
                 </div>
-				<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
-				<p><span>@Model.Tag</span> - <span>@Model.ReadingState</span></o> 
+				<p><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></o> 
+				<a class="btn btn-outline-primary btn-sm mt-3" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
 			</aside>
         </div>
     </div>

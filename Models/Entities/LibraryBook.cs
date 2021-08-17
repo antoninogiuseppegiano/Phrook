@@ -23,6 +23,8 @@ namespace Phrook.Models.Entities
             }  */  
             BookId = bookId;
             UserId = userId;
+			Rating = 0;
+			ReadingState = Enums.ReadingState.NotRead.GetDescription();
         }
 
 		public int Id { get; private set; }
@@ -37,9 +39,9 @@ namespace Phrook.Models.Entities
 		
 		public void ChangeRating(double newRating)
         {
-            if (newRating < 1 || newRating > 5)
+            if (newRating < 0.1 || newRating > 5)
             {
-                throw new ArgumentException("The rating must be between 1 and 5.");
+                throw new ArgumentException("The rating must be between 0.1 and 5.");
             }
             Rating = newRating;
         }

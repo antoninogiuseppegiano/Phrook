@@ -15,7 +15,7 @@ namespace Phrook.Models.InputModels
 		// [Required]
 		public string Title { get; set; }
 
-		[Range(0.5, 5, ErrorMessage = "La valutazione puù andare da {1} a {2}.")]
+		[Range(0, 5, ErrorMessage = "La valutazione può andare da {1} a {2}.")]
 		[Display(Name = "Valutazione")]
 		public double Rating { get; set; }
 

@@ -189,7 +189,7 @@ namespace Phrook.Controllers
 				throw new InvalidApiInputException(id);
 			}
 
-			//TODO: se appartiene all'utente
+			//se appartiene all'utente
 			BookDetailViewModel book;
 			try
 			{

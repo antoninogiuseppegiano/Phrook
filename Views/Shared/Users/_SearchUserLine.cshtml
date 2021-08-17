@@ -1,0 +1,13 @@
+@model SearchedUserViewModel
+
+<hr>
+<div class="row book-library search">
+	<div class="col-md-7">
+		<h2>@Model.FullName</h2>
+	</div>
+	<div class="col-md-2"></div>
+	<div class="col-md-3 d-flex align-items-center">
+		<a class="btn btn-outline-primary btn-lg" asp-action="Index" asp-route-userId="@Model.Id">Visita libreria</a>  
+	</div>
+	
+</div>

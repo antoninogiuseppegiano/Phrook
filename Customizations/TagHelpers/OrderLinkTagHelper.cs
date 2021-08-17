@@ -9,6 +9,7 @@ namespace Phrook.Customizations.TagHelpers
     {
         public string OrderBy { get; set; }
         public BookListInputModel Input { get; set; }
+		public string UserId { get; set; }
 
         public OrderLinkTagHelper(IHtmlGenerator generator) : base(generator)
         {
@@ -22,7 +23,11 @@ namespace Phrook.Customizations.TagHelpers
             RouteValues["search"] = Input.Search;
             RouteValues["orderby"] = OrderBy;
             RouteValues["ascending"] = (Input.OrderBy == OrderBy ? !Input.Ascending : Input.Ascending).ToString().ToLowerInvariant();
-            
+            if(!string.IsNullOrWhiteSpace(UserId))
+			{
+				RouteValues["userId"] = UserId;
+			}
+
             //Faccio generare l'output all'AnchorTagHelper
             base.Process(context, output);
 
