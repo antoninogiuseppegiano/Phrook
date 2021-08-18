@@ -35,6 +35,8 @@ namespace Phrook.Models.Entities
 		public double Rating { get; private set; }
         public string Tag { get; private set; }
         public string ReadingState { get; private set; }
+        public string InitialTime { get; private set; }
+        public string FinalTime { get; private set; }
         public string RowVersion { get; private set; }
 		
 		public void ChangeRating(double newRating)
@@ -65,5 +67,40 @@ namespace Phrook.Models.Entities
             }
             ReadingState = ((ReadingState)newReadingStateIndex).GetDescription();
         }
+		
+		public void ChangeInitialTime(DateTime time)
+        {
+			if(time.Date > DateTime.Now.Date  || time.Year < 1900)
+            {
+                // throw new ArgumentException("This initial time value isn't valid.");
+				InitialTime = DateTime.MinValue.Date.ToString("yyyy-MM-dd");
+				return;
+            }
+
+            InitialTime = time.Date.ToString("yyyy-MM-dd");
+			CheckFinalTimeAfterInitialTime();
+        }
+
+		public void ChangeFinalTime(DateTime time)
+        {
+			if(time.Date > DateTime.Now.Date || time.Year < 1900)
+            {
+                // throw new ArgumentException("This final time value isn't valid.");
+				FinalTime = DateTime.MinValue.Date.ToString("yyyy-MM-dd");
+				return;
+            }
+
+            FinalTime = time.Date.ToString("yyyy-MM-dd");
+			
+			CheckFinalTimeAfterInitialTime();
+        }
+
+		private void CheckFinalTimeAfterInitialTime()
+		{
+			if(Convert.ToDateTime(InitialTime).Date > Convert.ToDateTime(FinalTime).Date)
+            {
+				FinalTime = DateTime.MinValue.Date.ToString("yyyy-MM-dd");
+            }
+		}
 	}
 }

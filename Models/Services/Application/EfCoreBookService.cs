@@ -13,6 +13,7 @@ using Phrook.Models.InputModels;
 using Phrook.Models.Options;
 using Phrook.Models.Services.HttpClients;
 using Phrook.Models.Services.Infrastructure;
+using Phrook.Models.Util;
 using Phrook.Models.ViewModels;
 using Z.EntityFramework.Plus;
 
@@ -72,7 +73,9 @@ namespace Phrook.Models.Services.Application
 					Rating = libraryBook.Rating,
 					Tag = libraryBook.Tag,
 					ReadingState = libraryBook.ReadingState,
-					Description = libraryBook.Book.Description
+					Description = libraryBook.Book.Description,
+					InitialTime = libraryBook.InitialTime,
+					FinalTime = libraryBook.FinalTime
 				});
 				book = await query.SingleAsync();
 			}
@@ -187,7 +190,9 @@ namespace Phrook.Models.Services.Application
 					Rating = libraryBook.Rating,
 					Tag = libraryBook.Tag,
 					ReadingState = libraryBook.ReadingState,
-					Description = libraryBook.Book.Description
+					Description = libraryBook.Book.Description,
+					InitialTime = libraryBook.InitialTime,
+					FinalTime = libraryBook.FinalTime
 				})
 				.SingleAsync();
 			}
@@ -219,6 +224,8 @@ namespace Phrook.Models.Services.Application
 			book.ChangeRating(inputModel.Rating);
 			book.ChangeTag(inputModel.Tag);
 			book.ChangeReadingState(inputModel.ReadingState);
+			book.ChangeInitialTime(inputModel.InitialTime);
+			book.ChangeFinalTime(inputModel.FinalTime);
 
 			dbContext.Entry(book).Property(book => book.RowVersion).OriginalValue = inputModel.RowVersion;
 
@@ -245,7 +252,9 @@ namespace Phrook.Models.Services.Application
 				ImagePath = book.Book.ImagePath,
 				Rating = book.Rating,
 				Tag = book.Tag,
-				ReadingState = book.ReadingState
+				ReadingState = book.ReadingState,
+				InitialTime = book.InitialTime,
+				FinalTime = book.FinalTime
 			};
 
 		}
@@ -268,16 +277,18 @@ namespace Phrook.Models.Services.Application
 				query = dbContext.LibraryBooks
 				.AsNoTracking()
 				.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == id)
-				.Select(librarybook =>
+				.Select(libraryBook =>
 				new EditBookInputModel
 				{
-					BookId = librarybook.BookId,
-					Title = librarybook.Book.Title,
+					BookId = libraryBook.BookId,
+					Title = libraryBook.Book.Title,
 
-					Rating = librarybook.Rating,
-					Tag = librarybook.Tag,
-					ReadingState = librarybook.ReadingState,
-					RowVersion = librarybook.RowVersion
+					Rating = libraryBook.Rating,
+					Tag = libraryBook.Tag,
+					ReadingState = libraryBook.ReadingState,
+					InitialTime = Utility._getDateTimeFromyyyy_MM_dd(libraryBook.InitialTime),
+					FinalTime = Utility._getDateTimeFromyyyy_MM_dd(libraryBook.FinalTime),
+					RowVersion = libraryBook.RowVersion
 				});
 
 				EditBookInputModel book = await query.SingleAsync();

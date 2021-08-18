@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Phrook.Customizations.ModelBinders;
 using Phrook.Models.Enums;
+using Phrook.Customizations.ExtensionMethods;
 
 namespace Phrook.Models.InputModels
 {
@@ -24,6 +25,15 @@ namespace Phrook.Models.InputModels
 
 		[Display(Name = "Stato")]
 		public string ReadingState { get; set; }
+		
+		[Display(Name = "Inizio lettura")]
+		[DataType(DataType.Date)]
+		public DateTime InitialTime { get; set; }
+
+		[Display(Name = "Fine lettura")]
+		[DataType(DataType.Date)]
+		public DateTime FinalTime { get; set; }
+
 		public string RowVersion { get; set; }
 
 		public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -32,12 +42,25 @@ namespace Phrook.Models.InputModels
 			int.TryParse(ReadingState, out int intRS);
 			if (!Enum.IsDefined(typeof(Tag), intTag))
 			{
-				yield return new ValidationResult("Il tag non è accetabile.", new[] { nameof(Tag) });
+				yield return new ValidationResult("Il tag non è accettabile.", new[] { nameof(Tag) });
 			}
 			if (!Enum.IsDefined(typeof(ReadingState), intRS))
 			{
-				yield return new ValidationResult("Lo stato non è accetabile.", new[] { nameof(ReadingState) });
+				yield return new ValidationResult("Lo stato non è accettabile.", new[] { nameof(ReadingState) });
 			}
+			if(ReadingState != ((int)Enums.ReadingState.NotRead).ToString())
+			{
+				if(InitialTime.Date > DateTime.Now.Date || InitialTime.Year < 1900){
+					yield return new ValidationResult("La data iniziale non è accettabile.", new[] { nameof(InitialTime) });
+				}
+				if(ReadingState != ((int)Enums.ReadingState.Reading).ToString())
+				{
+					if(InitialTime.Date > FinalTime.Date|| FinalTime.Year < 1900){
+						yield return new ValidationResult("Non puoi finire di leggere un libro prima di iniziarlo.", new[] { nameof(FinalTime) });
+					}
+				}
+			}
+			
 		}
 	}
 }

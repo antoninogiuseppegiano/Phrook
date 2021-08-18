@@ -68,6 +68,11 @@ namespace Phrook.Models.Services.Infrastructure
                 entity.Property(e => e.ReadingState).HasColumnType("TEXT (100)");
                 entity.Property(e => e.Tag).HasColumnType("TEXT (100)");
 
+                entity.Property(e => e.InitialTime)
+					.HasColumnType("TEXT");
+                entity.Property(e => e.FinalTime)
+					.HasColumnType("TEXT");
+					
 				entity.HasOne(libraryBook => libraryBook.User)
 					.WithMany(user => user.Library)
 					.HasForeignKey(libraryBook => libraryBook.UserId);

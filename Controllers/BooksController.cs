@@ -74,6 +74,7 @@ namespace Phrook.Controllers
 				{
 					ModelState.Clear();
 					ModelState.AddModelError("", "Salvataggio interrotto. Le informazioni non sono più aggiornate. Aggiorna la pagina manualmente.");
+					return RedirectToAction(nameof(Edit), new { id = inputModel.BookId });
 				}
 				catch
 				{

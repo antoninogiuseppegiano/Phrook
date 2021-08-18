@@ -1,7 +1,7 @@
 @model EditBookInputModel
 
 <section class="book-info">
-	<form method="post">
+	<form method="post" id="editForm">
 		<input type="hidden" asp-for="RowVersion">
 		<div class="row">
 			<div class="col-md-9">
@@ -41,6 +41,16 @@
 						<select asp-items="@Html.GetEnumSelectList<ReadingState>()" asp-for="ReadingState" class="form-control"></select>
 						<span asp-validation-for="ReadingState"></span>
                     </div>
+					<div class="form-group">
+						<label asp-for="InitialTime"></label>
+						<input type="date" asp-for="InitialTime" min="1900-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@Model.InitialTime.ToString("yyyy-MM-dd")" class="form-control form-control-block">
+						<span asp-validation-for="InitialTime"></span>
+					</div>
+					<div class="form-group">
+						<label asp-for="FinalTime"></label>
+						<input type="date" asp-for="FinalTime" min="1900-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@Model.FinalTime.ToString("yyyy-MM-dd")" class="form-control form-control-block">
+						<span asp-validation-for="FinalTime"></span>
+					</div>
                 </aside>
             </div>
         </div>
@@ -82,8 +92,7 @@
 				opt.selected = true;
 				select.appendChild(opt);
 			}
-			else 
-			{
+			else{
 				opt = document.getElementsByTagName('option');
 				for(let i = 0; i < opt.length; i++) {
 					if(opt[i].innerHTML == stringValue) {
@@ -93,8 +102,60 @@
 				}
 			}
 		};
-		setSelect('Tag', '@(Model.Tag)')
-		setSelect('ReadingState', '@(Model.ReadingState)')
+
+		let initial = document.getElementById("InitialTime"),
+				final = document.getElementById("FinalTime");
+		function displayDateSelectors(){
+			let selectId = 'ReadingState';
+			let value = document.getElementById(selectId).value;
+			switch(value){
+				case "3": //Letto
+				case "2": //Interrotto
+					initial.disabled = false;
+					final.disabled = false;
+					initial.parentElement.style.display = 'block';
+					final.parentElement.style.display = 'block';
+					break;
+				case "1": //In lettura
+					initial.disabled = false;
+					final.disabled = true;
+					initial.parentElement.style.display = 'block';
+					final.parentElement.style.display = 'none';
+					break;
+				case "0": //Non letto
+					final.disabled = true;
+					initial.disabled = true;
+					initial.parentElement.style.display = 'none';
+					final.parentElement.style.display = 'none';
+					break;
+				default:
+					initial.disabled = true;
+					final.disabled = true;
+					initial.parentElement.style.display = 'none';
+					final.parentElement.style.display = 'none';
+					break;
+			}
+		}
+
+		document.getElementById('ReadingState').addEventListener('change', displayDateSelectors);
+
+		setSelect('Tag', '@(Model.Tag)');
+		setSelect('ReadingState', '@(Model.ReadingState)');
+		if(parseInt(initial.value.substring(0, 4)) < 1900) {
+			initial.value = '@DateTime.Now.ToString("yyyy-MM-dd")';
+		}
+		else{
+			initial.value = '@Model.InitialTime.ToString("yyyy-MM-dd")';
+		}
+		
+		if(parseInt(final.value.substring(0, 4)) < 1900) {
+			final.value = '@DateTime.Now.ToString("yyyy-MM-dd")';
+		}
+		else{
+			final.value = '@Model.FinalTime.ToString("yyyy-MM-dd")';
+		}
+
+		displayDateSelectors();
 	</script>
 }
 

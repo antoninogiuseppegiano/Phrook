@@ -18,7 +18,16 @@
 				<div class="rating d-flex justify-content-center" title="@Model.Rating">
                     <rating value="@Model.Rating"></rating>
                 </div>
-				<p class="mb-1"><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></p> 
+				@* TODO: prelevare "Non letto" e "In lettura" dalle descriptions degli enums NotRead e Reading *@
+				@if(@Model.ReadingState != "Non letto" && !string.IsNullOrWhiteSpace(Model.InitialTime))
+				{
+				<p>Iniziato: <span>@Model.InitialTime</span></p>
+					@if(@Model.ReadingState != "In lettura" && !string.IsNullOrWhiteSpace(Model.FinalTime))
+					{
+						<p>Finito: <span>@Model.FinalTime</span></p>
+					}
+				}
+				<p class="mb-1"><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></p>
 				<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
 			</aside>
         </div>
