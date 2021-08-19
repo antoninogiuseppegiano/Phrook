@@ -1,7 +1,9 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Phrook.Models.Exceptions;
 using Phrook.Models.InputModels;
 using Phrook.Models.Services.Application;
 using Phrook.Models.ViewModels;
@@ -11,8 +13,10 @@ namespace Phrook.Controllers
 	public class UsersController : Controller
 	{
 		private readonly IUserService userService;
-		public UsersController(IUserService userService)
+		private readonly IHttpContextAccessor httpContextAccessor;
+		public UsersController(IHttpContextAccessor httpContextAccessor, IUserService userService)
 		{
+			this.httpContextAccessor = httpContextAccessor;
 			this.userService = userService;
 		}
 		public async Task<IActionResult> Search(string searchUser)
@@ -24,9 +28,20 @@ namespace Phrook.Controllers
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
 
-			ListViewModel<SearchedUserViewModel> users = await userService.GetUsers(searchUser);
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
 
-			SearchUserListViewModel result = new() {
+			ListViewModel<SearchedUserViewModel> users = await userService.GetUsers(currentUserId, searchUser);
+
+			SearchUserListViewModel result = new()
+			{
 				SearchUser = searchUser,
 				Users = users
 			};
@@ -37,7 +52,7 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Index(string userId, BookListInputModel input)
 		{
-			if(await userService.IsVisible(userId))
+			if (await userService.IsVisible(userId))
 			{
 				string fullName = await userService.GetUserFullName(userId);
 				ViewData["Filter"] = input.Search;

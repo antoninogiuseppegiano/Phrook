@@ -6,8 +6,8 @@ namespace Phrook.Models.Services.Application
 {
 	public interface IWishlistService
 	{
-		Task<ListViewModel<WishlistViewModel>> GetBooksAsync(BookListInputModel input);
-		Task RemoveBookFromWishlist(string wishlistId);
-		Task AddBookToWishlist(string bookId);
+		Task<ListViewModel<WishlistViewModel>> GetBooksAsync(string currentUserId, BookListInputModel input);
+		Task RemoveBookFromWishlist(string currentUserId, string wishlistId);
+		Task AddBookToWishlist(string currentUserId, string bookId);
 	}
 }

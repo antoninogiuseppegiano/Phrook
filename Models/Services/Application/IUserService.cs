@@ -6,9 +6,10 @@ namespace Phrook.Models.Services.Application
 {
     public interface IUserService
     {
-        Task<ListViewModel<SearchedUserViewModel>> GetUsers(string fullname);
+        Task<ListViewModel<SearchedUserViewModel>> GetUsers(string currentUserId, string fullname);
 		Task<string> GetUserFullName(string userId);
 		Task<ListViewModel<BookViewModel>> GetUserBooks(string userId, BookListInputModel input);
 		Task<bool> IsVisible(string userId);
+		
 	}
 }

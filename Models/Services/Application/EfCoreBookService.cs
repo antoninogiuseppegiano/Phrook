@@ -42,26 +42,15 @@ namespace Phrook.Models.Services.Application
 			this.dbContext = dbContext;
 		}
 
-		public async Task<BookDetailViewModel> GetBookByIdAsync(string id)
+		public async Task<BookDetailViewModel> GetBookByIdAsync(string currentUserId, string id)
 		{
 			logger.LogInformation("Book id: {id} requested.", id);
 			BookDetailViewModel book;
 			try
 			{
-				//int.TryParse(id, out int intId);
-				string userId = "";
-				try
-				{
-					userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-				}
-				catch (NullReferenceException)
-				{
-					throw new UserUnknownException();
-				}
-
 				var query = dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(libraryBook => libraryBook.BookId == id && libraryBook.UserId == userId)
+				.Where(libraryBook => libraryBook.BookId == id && libraryBook.UserId == currentUserId)
 				.Select(libraryBook =>
 				new BookDetailViewModel
 				{
@@ -88,7 +77,7 @@ namespace Phrook.Models.Services.Application
 			return book;
 		}
 
-		public async Task<ListViewModel<BookViewModel>> GetBooksAsync(BookListInputModel model)
+		public async Task<ListViewModel<BookViewModel>> GetBooksAsync(string currentUserId, BookListInputModel model)
 		{
 			logger.LogInformation("Book list requested.");
 			model.Search = model.Search?.Trim();
@@ -119,21 +108,11 @@ namespace Phrook.Models.Services.Application
 					break;
 			}
 
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-
 			string searchString = model.Search.ToLower();
 			IQueryable<BookViewModel> query = baseQuery
 			.AsNoTracking()
 			//TODO: implementare fuzzy
-			.Where(libraryBook => libraryBook.UserId == userId && libraryBook.Book.NormalizedTitle.Contains(searchString))
+			.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.Book.NormalizedTitle.Contains(searchString))
 			.Select(libraryBook =>
 			new BookViewModel
 			{
@@ -161,24 +140,16 @@ namespace Phrook.Models.Services.Application
 			return result;
 		}
 
-		public async Task<BookDetailViewModel> GetBookByISBNAsync(string ISBN)
+		public async Task<BookDetailViewModel> GetBookByISBNAsync(string currentUserId, string ISBN)
 		{
 			logger.LogInformation("Book ISBN: {ISBN} requested.", ISBN);
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			
 			BookDetailViewModel book;
 			try
 			{
 				book = await dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(libraryBook => libraryBook.UserId == userId && libraryBook.Book.Isbn.Equals(ISBN))
+				.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.Book.Isbn.Equals(ISBN))
 				.Select(libraryBook =>
 				new BookDetailViewModel
 				{
@@ -205,19 +176,10 @@ namespace Phrook.Models.Services.Application
 			return book;
 		}
 
-		public async Task<BookDetailViewModel> EditBookAsync(EditBookInputModel inputModel)
+		public async Task<BookDetailViewModel> EditBookAsync(string currentUserId, EditBookInputModel inputModel)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
 			LibraryBook book = await dbContext.LibraryBooks
-				.Where(librarybook => librarybook.UserId == userId && librarybook.BookId == inputModel.BookId)
+				.Where(librarybook => librarybook.UserId == currentUserId && librarybook.BookId == inputModel.BookId)
 				.Include(libraryBook => libraryBook.Book)
 				.FirstOrDefaultAsync();
 
@@ -256,27 +218,16 @@ namespace Phrook.Models.Services.Application
 				InitialTime = book.InitialTime,
 				FinalTime = book.FinalTime
 			};
-
 		}
 
-		public async Task<EditBookInputModel> GetBookForEditingAsync(string id)
+		public async Task<EditBookInputModel> GetBookForEditingAsync(string currentUserId, string id)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
 			IQueryable<EditBookInputModel> query;
 			try
 			{
-				//int.TryParse(id, out int intId);
 				query = dbContext.LibraryBooks
 				.AsNoTracking()
-				.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == id)
+				.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == id)
 				.Select(libraryBook =>
 				new EditBookInputModel
 				{
@@ -300,19 +251,9 @@ namespace Phrook.Models.Services.Application
 			}
 		}
 
-		public async Task RemoveBookFromLibrary(string bookId)
+		public async Task RemoveBookFromLibrary(string currentUserId, string bookId)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-			// int.TryParse(id, out int intId);
-			int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == userId && libraryBook.BookId == bookId).DeleteAsync();
+			int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).DeleteAsync();
 			if (affectedRows is 1)
 			{
 				await dbContext.SaveChangesAsync();
@@ -326,7 +267,7 @@ namespace Phrook.Models.Services.Application
 				throw new TooManyRowsException(affectedRows);
 			}
 
-			//Per avere db più snello rimuovere riga del db se nessun utente ha più quel libro?
+			//Per avere db più snello, rimuove riga del db se nessun utente ha più quel libro
 			// eliminazione dal db con EF Core PLUS
 			bool isStillInLibrary = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.BookId == bookId).CountAsync() > 0;
 			if(!isStillInLibrary)
@@ -348,19 +289,8 @@ namespace Phrook.Models.Services.Application
 			
 		}
 
-		public async Task AddBookToLibrary(string bookId)
+		public async Task AddBookToLibrary(string currentUserId, string bookId)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-			//int.TryParse(bookId, out int intId);
-
 			LibraryBook libraryBook;
 			if (!(await IsBookStoredInBooks(bookId)))
 			{
@@ -381,7 +311,7 @@ namespace Phrook.Models.Services.Application
 				// }
 			}
 
-			libraryBook = new(bookId, userId);
+			libraryBook = new(bookId, currentUserId);
 
 			dbContext.Add(libraryBook);
 			try
@@ -394,7 +324,7 @@ namespace Phrook.Models.Services.Application
 			}
 
 			//Removing from wishlist
-			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == userId).DeleteAsync();
+			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
 			if (affectedRows is 1)
 			{
 				await dbContext.SaveChangesAsync();
@@ -411,18 +341,9 @@ namespace Phrook.Models.Services.Application
 			return isStored;
 		}
 
-		public async Task<bool> IsBookInWishList(string bookId)
+		public async Task<bool> IsBookInWishList(string currentUserId, string bookId)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-			bool isStored = await dbContext.Wishlist.AnyAsync(book => EF.Functions.Like(book.BookId, bookId) && EF.Functions.Like(book.UserId, userId));
+			bool isStored = await dbContext.Wishlist.AnyAsync(book => EF.Functions.Like(book.BookId, bookId) && EF.Functions.Like(book.UserId, currentUserId));
 			return isStored;
 		}
 
@@ -455,18 +376,9 @@ namespace Phrook.Models.Services.Application
 			return book;
 		}
 
-		public async Task<bool> IsBookAddedToLibrary(string id)
+		public async Task<bool> IsBookAddedToLibrary(string currentUserId, string id)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-			bool added = await dbContext.LibraryBooks.AnyAsync(book => EF.Functions.Like(book.BookId, id)  && EF.Functions.Like(book.UserId, userId));
+			bool added = await dbContext.LibraryBooks.AnyAsync(book => EF.Functions.Like(book.BookId, id)  && EF.Functions.Like(book.UserId, currentUserId));
 			return added;
 		}
 	}

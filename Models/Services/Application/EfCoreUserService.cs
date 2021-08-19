@@ -54,14 +54,16 @@ namespace Phrook.Models.Services.Application
 					break;
 			}
 
-			try
-			{
-				string _ = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			// try
+			// {
+			// 	string _ = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			// }
+			// catch (NullReferenceException)
+			// {
+			// 	throw new UserUnknownException();
+			// }
+
+			
 
 			string searchString = input.Search.ToLower();
 			IQueryable<BookViewModel> query = baseQuery
@@ -109,24 +111,15 @@ namespace Phrook.Models.Services.Application
 			return fullName;
 		}
 
-		public async Task<ListViewModel<SearchedUserViewModel>> GetUsers(string fullname)
+		public async Task<ListViewModel<SearchedUserViewModel>> GetUsers(string currentUserId, string fullname)
 		{
 			fullname = fullname?.Trim();
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
 
 			string searchString = fullname.ToLower();
 			IQueryable<SearchedUserViewModel> query = dbContext.Users
 			.AsNoTracking()
 			//TODO: implementare fuzzy
-			.Where(user => user.Visibility && user.NormalizedFullName.Contains(searchString) && user.Id != userId)
+			.Where(user => user.Visibility && user.NormalizedFullName.Contains(searchString) && user.Id != currentUserId)
 			.Select(user =>
 			new SearchedUserViewModel
 			{

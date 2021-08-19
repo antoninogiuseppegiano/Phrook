@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
+using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Phrook.Models.Exceptions;
 using Phrook.Models.InputModels;
-using Phrook.Models.ResponseModels;
 using Phrook.Models.Services.Application;
 using Phrook.Models.Services.HttpClients;
 using Phrook.Models.Util;
@@ -19,15 +16,27 @@ namespace Phrook.Controllers
 	{
 		private readonly IGoogleBooksClient _gbClient;
 		private readonly IBookService _bookService;
-		public BooksController(IBookService bookService, IGoogleBooksClient gbClient)
+		private readonly IHttpContextAccessor httpContextAccessor;
+		public BooksController(IHttpContextAccessor httpContextAccessor, IBookService bookService, IGoogleBooksClient gbClient)
 		{
+			this.httpContextAccessor = httpContextAccessor;
 			this._gbClient = gbClient;
 			this._bookService = bookService;
 		}
 
 		public async Task<IActionResult> Index(BookListInputModel input)
 		{
-			ListViewModel<BookViewModel> books = await _bookService.GetBooksAsync(input);
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			ListViewModel<BookViewModel> books = await _bookService.GetBooksAsync(currentUserId, input);
 
 			ViewData["Filter"] = input.Search;
 
@@ -43,30 +52,61 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Detail([FromRoute] string id)
 		{
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			
 			BookDetailViewModel book;
-			book = await _bookService.GetBookByIdAsync(id);
+			book = await _bookService.GetBookByIdAsync(currentUserId, id);
 
 			//return the view /views/Books/Index
 			ViewData["Title"] = Utility._getShortTitle(book.Title);
 			return View(book);
 		}
 
-		public async Task<IActionResult> Edit([FromRoute] string id) 
+		public async Task<IActionResult> Edit([FromRoute] string id)
 		{
-			EditBookInputModel inputModel = await _bookService.GetBookForEditingAsync(id);
+			
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			EditBookInputModel inputModel = await _bookService.GetBookForEditingAsync(currentUserId, id);
 			//TODO ricarica pagina
 			ViewData["Title"] = "Modifica libro";
 			return View(inputModel);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit(EditBookInputModel inputModel) 
+		public async Task<IActionResult> Edit(EditBookInputModel inputModel)
 		{
-			if(ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
+				string currentUserId = "";
 				try
 				{
-					BookDetailViewModel book = await _bookService.EditBookAsync(inputModel);
+					currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+				}
+				catch (NullReferenceException)
+				{
+					throw new UserUnknownException();
+				}
+
+				try
+				{
+					BookDetailViewModel book = await _bookService.EditBookAsync(currentUserId, inputModel);
 					TempData["ConfirmationMessage"] = "Campi aggiornati correttamente.";
 					return RedirectToAction(nameof(Detail), new { id = inputModel.BookId });
 				}
@@ -90,6 +130,16 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Search(SearchApiInputModel input)
 		{
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			
 			ViewData["SearchTitle"] = input.SearchTitle;
 			ViewData["SearchAuthor"] = input.SearchAuthor;
 			if (string.IsNullOrWhiteSpace(input.SearchTitle + input.SearchAuthor))
@@ -97,8 +147,6 @@ namespace Phrook.Controllers
 				//throw new InvalidApiInputException(input.SearchTitle, input.SearchAuthor);
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
-
-			
 
 			ListViewModel<SearchedBookViewModel> books;
 
@@ -109,9 +157,9 @@ namespace Phrook.Controllers
 			{
 				books = await _gbClient.GetBooksByTitleAuthorAsync(input.SearchTitle, input.SearchAuthor);
 			}
-			catch(ApiException) 
+			catch (ApiException)
 			{
-				books = new() {Results = new()};;
+				books = new() { Results = new() }; ;
 			}
 
 			//TODO: mettere insieme i risultati delle due chiamate (prendere id unici)
@@ -122,20 +170,21 @@ namespace Phrook.Controllers
 			// 		paginated.Add(books.Results[i+input.Offset]);
 			// 	}
 			// }
-			foreach(var b in books.Results) 
+			foreach (var b in books.Results)
 			{
-				bool isInLibrary = await _bookService.IsBookAddedToLibrary(b.Id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, b.Id);
 				b.IsInLibrary = isInLibrary;
 			}
 
-			var viewModel = new SearchBookListViewModel {
+			var viewModel = new SearchBookListViewModel
+			{
 				Books = books,
 				Input = input
 			};
 			ViewData["Title"] = "Ricerca";
 			return View(viewModel);
 		}
-		
+
 		public async Task<IActionResult> OverviewByISBN(string searchISBN)
 		{
 			ViewData["SearchISBN"] = searchISBN;
@@ -143,41 +192,53 @@ namespace Phrook.Controllers
 			{
 				//throw new InvalidApiInputException(searchISBN);
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
-			}			
+			}
+
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
 
 			BookDetailViewModel book;
 			try
 			{
-				book = await _bookService.GetBookByISBNAsync(searchISBN);
-			} 
+				book = await _bookService.GetBookByISBNAsync(currentUserId, searchISBN);
+			}
 			catch
 			{
 				book = null;
 			}
 
-			if(book is not null)
+			if (book is not null)
 			{
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
-				return RedirectToAction(nameof(Detail), new { id = book.Id});
+				return RedirectToAction(nameof(Detail), new { id = book.Id });
 			}
-			
+
 			string bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
 			BookOverviewViewModel overviewViewModel;
-			
-			try {
+
+			try
+			{
 				overviewViewModel = await _gbClient.GetBookByIdAsync(bookId);
-			} 
-			catch(ApiException) 
+			}
+			catch (ApiException)
 			{
 				overviewViewModel = null;
 				throw new BookNotFoundException(searchISBN);
 			}
 
-			bool isInLibrary = await _bookService.IsBookAddedToLibrary(overviewViewModel.Id);
+			bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, overviewViewModel.Id);
 			overviewViewModel.IsInLibrary = isInLibrary;
-			bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+			bool isInWishlist = await _bookService.IsBookInWishList(currentUserId, overviewViewModel.Id);
 			overviewViewModel.IsInWishlist = isInWishlist;
-			SearchBookViewModel viewModel =  new()  {
+			SearchBookViewModel viewModel = new()
+			{
 				Book = overviewViewModel,
 				Search = searchISBN
 			};
@@ -187,6 +248,16 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> OverviewById(string id)
 		{
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
 			if (string.IsNullOrWhiteSpace(id))
 			{
 				throw new InvalidApiInputException(id);
@@ -196,45 +267,45 @@ namespace Phrook.Controllers
 			BookDetailViewModel book;
 			try
 			{
-				book = await _bookService.GetBookByIdAsync(id);
+				book = await _bookService.GetBookByIdAsync(currentUserId, id);
 			}
-			catch (BookNotFoundException){ book = null; }
+			catch (BookNotFoundException) { book = null; }
 
-			if(book is not null) 
+			if (book is not null)
 			{
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
 				return RedirectToAction(nameof(Detail), new { id = id });
 			}
 
 			BookOverviewViewModel overviewViewModel;
-			if(await _bookService.IsBookStoredInBooks(id))
+			if (await _bookService.IsBookStoredInBooks(id))
 			{
 				overviewViewModel = await _bookService.GetBookNotAddedInLibaryByIdAsync(id);
-				bool isInLibrary = await _bookService.IsBookAddedToLibrary(id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, id);
 				overviewViewModel.IsInLibrary = isInLibrary;
-				bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+				bool isInWishlist = await _bookService.IsBookInWishList(currentUserId, overviewViewModel.Id);
 				overviewViewModel.IsInWishlist = isInWishlist;
 			}
 			else
 			{
-				try 
+				try
 				{
 					overviewViewModel = await _gbClient.GetBookByIdAsync(id);
 					overviewViewModel.IsInLibrary = false;
 					overviewViewModel.IsInWishlist = false;
 				}
-				catch(ApiException) 
+				catch (ApiException)
 				{
 					throw new BookNotFoundException(id);
 				}
 			}
-			
 
-			if(overviewViewModel is not null) 
+
+			if (overviewViewModel is not null)
 			{
-				bool isInLibrary = await _bookService.IsBookAddedToLibrary(overviewViewModel.Id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, overviewViewModel.Id);
 				overviewViewModel.IsInLibrary = isInLibrary;
-				bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+				bool isInWishlist = await _bookService.IsBookInWishList(currentUserId, overviewViewModel.Id);
 				overviewViewModel.IsInWishlist = isInWishlist;
 				var viewModel = new SearchBookViewModel
 				{
@@ -248,15 +319,25 @@ namespace Phrook.Controllers
 			{
 				throw new BookNotFoundException(id);
 			}
-			
-			
+
+
 		}
 
-		public async Task<IActionResult> AddToLibrary(string id) 
+		public async Task<IActionResult> AddToLibrary(string id)
 		{
+			string currentUserId = "";
 			try
 			{
-				await _bookService.AddBookToLibrary(id);
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			try
+			{
+				await _bookService.AddBookToLibrary(currentUserId, id);
 			}
 			catch
 			{
@@ -266,12 +347,22 @@ namespace Phrook.Controllers
 			TempData["ConfirmationMessage"] = "Libro aggiunto alla libreria.";
 			return RedirectToAction(nameof(Index));
 		}
-	
+
 		public async Task<IActionResult> Delete(string id)
 		{
+			string currentUserId = "";
 			try
 			{
-				await _bookService.RemoveBookFromLibrary(id);
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			try
+			{
+				await _bookService.RemoveBookFromLibrary(currentUserId, id);
 			}
 			catch (BookNotFoundException)
 			{

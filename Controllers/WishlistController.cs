@@ -1,3 +1,5 @@
+using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +15,27 @@ namespace Phrook.Controllers
 	{
 		private readonly IWishlistService wishlistService;
 		private readonly IGoogleBooksClient gbClient;
-		public WishlistController(IWishlistService wishlistService, IGoogleBooksClient gbClient)
+		private readonly IHttpContextAccessor httpContextAccessor;
+		public WishlistController(IHttpContextAccessor httpContextAccessor, IWishlistService wishlistService, IGoogleBooksClient gbClient)
 		{
+			this.httpContextAccessor = httpContextAccessor;
 			this.gbClient = gbClient;
 			this.wishlistService = wishlistService;
 		}
-		
+
 		public async Task<IActionResult> Index(BookListInputModel input)
 		{
-			ListViewModel<WishlistViewModel> books = await wishlistService.GetBooksAsync(input);
+			string currentUserId = "";
+			try
+			{
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			ListViewModel<WishlistViewModel> books = await wishlistService.GetBooksAsync(currentUserId, input);
 
 			ViewData["Title"] = "Lista dei desideri";
 			return View(books);
@@ -29,9 +43,19 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Delete(string bookId)
 		{
+			string currentUserId = "";
 			try
 			{
-				await wishlistService.RemoveBookFromWishlist(bookId);
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+
+			try
+			{
+				await wishlistService.RemoveBookFromWishlist(currentUserId, bookId);
 			}
 			catch (BookNotFoundException)
 			{
@@ -39,14 +63,24 @@ namespace Phrook.Controllers
 				return RedirectToAction(Request.GetTypedHeaders().Referer.ToString());
 			}
 			TempData["ConfirmationMessage"] = "Libro rimosso dalla lista dei desideri.";
-			return RedirectToAction("OverviewById", "Books",  new { id = bookId });
+			return RedirectToAction("OverviewById", "Books", new { id = bookId });
 		}
 
-		public async Task<IActionResult> AddToWishlist(string bookId) 
+		public async Task<IActionResult> AddToWishlist(string bookId)
 		{
+			string currentUserId = "";
 			try
 			{
-				await wishlistService.AddBookToWishlist(bookId);
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			
+			try
+			{
+				await wishlistService.AddBookToWishlist(currentUserId, bookId);
 			}
 			catch
 			{
@@ -54,7 +88,7 @@ namespace Phrook.Controllers
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
 			TempData["ConfirmationMessage"] = "Libro aggiunto alla lista dei desideri.";
-			return RedirectToAction("OverviewById", "Books",  new { id = bookId });
+			return RedirectToAction("OverviewById", "Books", new { id = bookId });
 		}
-	}	
+	}
 }

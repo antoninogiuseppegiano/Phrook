@@ -28,21 +28,13 @@ namespace Phrook.Models.Services.Application
 			this.httpContextAccessor = httpContextAccessor;
 			this.dbContext = dbContext;
 		}
-		public async Task<ListViewModel<WishlistViewModel>> GetBooksAsync(BookListInputModel input)
+		public async Task<ListViewModel<WishlistViewModel>> GetBooksAsync(string currentUserId, BookListInputModel input)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			
 			IQueryable<WishlistViewModel> query = dbContext.Wishlist
 			.AsNoTracking()
 			//TODO: implementare fuzzy
-			.Where(wishlist => wishlist.UserId == userId)
+			.Where(wishlist => wishlist.UserId == currentUserId)
 			.Select(wishlist =>
 			new WishlistViewModel
 			{
@@ -65,19 +57,9 @@ namespace Phrook.Models.Services.Application
 			return result;
 		}
 
-		public async Task RemoveBookFromWishlist(string bookId)
+		public async Task RemoveBookFromWishlist(string currentUserId, string bookId)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-
-			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == userId).DeleteAsync();
+			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
 			if (affectedRows is 1)
 			{
 				await dbContext.SaveChangesAsync();
@@ -92,19 +74,9 @@ namespace Phrook.Models.Services.Application
 			}
 		}
 
-		public async Task AddBookToWishlist(string bookId)
+		public async Task AddBookToWishlist(string currentUserId, string bookId)
 		{
-			string userId = "";
-			try
-			{
-				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
-
-			bool isBookAddedInLibrary = await dbContext.LibraryBooks.Where(l => l.UserId == userId && l.BookId == bookId).CountAsync() > 0;
+			bool isBookAddedInLibrary = await dbContext.LibraryBooks.Where(l => l.UserId == currentUserId && l.BookId == bookId).CountAsync() > 0;
 			if(isBookAddedInLibrary)
 			{
 				throw new BookNotAddedException(bookId);
@@ -117,7 +89,7 @@ namespace Phrook.Models.Services.Application
 
 				wishlist = new()
 				{
-					UserId = userId,
+					UserId = currentUserId,
 					BookId = bookId,
 					Isbn = overview.ISBN,
 					Title = overview.Title,
@@ -131,7 +103,7 @@ namespace Phrook.Models.Services.Application
 				Book book = await dbContext.Books.Where(book => book.BookId == bookId).SingleAsync();
 				wishlist = new()
 				{
-					UserId = userId,
+					UserId = currentUserId,
 					BookId = bookId,
 					Isbn = book.Isbn,
 					Title = book.Title,
