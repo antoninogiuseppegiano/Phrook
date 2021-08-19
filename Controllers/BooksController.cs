@@ -124,7 +124,7 @@ namespace Phrook.Controllers
 			// }
 			foreach(var b in books.Results) 
 			{
-				bool isInLibrary = await _bookService.IsBookStoredInLibrary(b.Id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(b.Id);
 				b.IsInLibrary = isInLibrary;
 			}
 
@@ -173,7 +173,7 @@ namespace Phrook.Controllers
 				throw new BookNotFoundException(searchISBN);
 			}
 
-			bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
+			bool isInLibrary = await _bookService.IsBookAddedToLibrary(overviewViewModel.Id);
 			overviewViewModel.IsInLibrary = isInLibrary;
 			bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
 			overviewViewModel.IsInWishlist = isInWishlist;
@@ -207,18 +207,32 @@ namespace Phrook.Controllers
 			}
 
 			BookOverviewViewModel overviewViewModel;
-			try 
+			if(await _bookService.IsBookStoredInBooks(id))
 			{
-				overviewViewModel = await _gbClient.GetBookByIdAsync(id);
+				overviewViewModel = await _bookService.GetBookNotAddedInLibaryByIdAsync(id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(id);
+				overviewViewModel.IsInLibrary = isInLibrary;
+				bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
+				overviewViewModel.IsInWishlist = isInWishlist;
 			}
-			catch(ApiException) 
+			else
 			{
-				throw new BookNotFoundException(id);
+				try 
+				{
+					overviewViewModel = await _gbClient.GetBookByIdAsync(id);
+					overviewViewModel.IsInLibrary = false;
+					overviewViewModel.IsInWishlist = false;
+				}
+				catch(ApiException) 
+				{
+					throw new BookNotFoundException(id);
+				}
 			}
+			
 
 			if(overviewViewModel is not null) 
 			{
-				bool isInLibrary = await _bookService.IsBookStoredInLibrary(overviewViewModel.Id);
+				bool isInLibrary = await _bookService.IsBookAddedToLibrary(overviewViewModel.Id);
 				overviewViewModel.IsInLibrary = isInLibrary;
 				bool isInWishlist = await _bookService.IsBookInWishList(overviewViewModel.Id);
 				overviewViewModel.IsInWishlist = isInWishlist;

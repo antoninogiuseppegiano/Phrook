@@ -43,6 +43,12 @@ author {
     white-space: nowrap;
 }
 
+.in-wishlist {
+    color: orangered;
+    white-space: nowrap;
+}
+
+
 footer {
     margin-top: 3em;
     padding-top: 2em;

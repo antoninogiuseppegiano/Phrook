@@ -111,7 +111,7 @@ namespace Phrook.Models.Services.Application
 			}
 
 			Wishlist wishlist;
-			if (!(await bookService.IsBookStoredInLibrary(bookId)))
+			if (!(await bookService.IsBookStoredInBooks(bookId)))
 			{
 				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
 

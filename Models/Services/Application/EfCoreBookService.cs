@@ -362,7 +362,7 @@ namespace Phrook.Models.Services.Application
 			//int.TryParse(bookId, out int intId);
 
 			LibraryBook libraryBook;
-			if (!(await IsBookStoredInLibrary(bookId)))
+			if (!(await IsBookStoredInBooks(bookId)))
 			{
 				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
 				if(string.IsNullOrWhiteSpace(overview.Description))
@@ -405,7 +405,7 @@ namespace Phrook.Models.Services.Application
 			}
 		}
 
-		public async Task<bool> IsBookStoredInLibrary(string bookId)
+		public async Task<bool> IsBookStoredInBooks(string bookId)
 		{
 			bool isStored = await dbContext.Books.AnyAsync(book => EF.Functions.Like(book.BookId, bookId));
 			return isStored;
@@ -424,6 +424,50 @@ namespace Phrook.Models.Services.Application
 			}
 			bool isStored = await dbContext.Wishlist.AnyAsync(book => EF.Functions.Like(book.BookId, bookId) && EF.Functions.Like(book.UserId, userId));
 			return isStored;
+		}
+
+		public async Task<BookOverviewViewModel> GetBookNotAddedInLibaryByIdAsync(string id)
+		{
+			BookOverviewViewModel book;
+			try
+			{
+				var query = dbContext.Books
+				.AsNoTracking()
+				.Where(book => book.BookId == id)
+				.Select(book =>
+				new BookOverviewViewModel
+				{
+					Id = book.BookId,
+					ISBN = book.Isbn,
+					Title = book.Title,
+					Author = book.Author,
+					ImagePath = book.ImagePath,
+					Description = book.Description
+				});
+				book = await query.SingleAsync();
+			}
+			catch (InvalidOperationException)
+			{
+				logger.LogWarning("Book {id} not found", id);
+				throw new BookNotFoundException(id);
+			}
+
+			return book;
+		}
+
+		public async Task<bool> IsBookAddedToLibrary(string id)
+		{
+			string userId = "";
+			try
+			{
+				userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
+			bool added = await dbContext.LibraryBooks.AnyAsync(book => EF.Functions.Like(book.BookId, id)  && EF.Functions.Like(book.UserId, userId));
+			return added;
 		}
 	}
 }

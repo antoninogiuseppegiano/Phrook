@@ -16,12 +16,11 @@
 							<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
 						</form>
 					</div>
-					@if(!book.IsInWishlist)
-					{
 					<div class="col-md-3 ms-0">
-						<a class="btn btn-lg" asp-controller="Wishlist" asp-action="AddToWishlist" asp-route-bookId="@Model.Book.Id"><i class="far fa-heart"></i></a>
+						<a class="btn btn-lg @(book.IsInWishlist ? "in-wishlist" : "")" asp-controller="Wishlist" asp-action="@(book.IsInWishlist ? "Delete" : "AddToWishlist")" asp-route-bookId="@Model.Book.Id">
+							<i class="@(book.IsInWishlist ? "fas" : "far") fa-heart"></i>
+						</a>
 					</div>
-					}
 				</div>
 				}
                 <img src="@book.ImagePath" class="img-fluid book-image" alt="@book.Title">

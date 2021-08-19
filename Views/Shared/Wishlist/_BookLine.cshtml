@@ -6,7 +6,7 @@
         <img src="@Model.ImagePath" width="52" height="52">
     </div>
     <div class="col-md-3">
-        <h2>@Model.Title</h2>
+        <h2><a asp-controller="Books" asp-action="overviewByID" asp-route-id="@Model.BookId">@Model.Title</a></h2>
     </div>
     <div class="col-md-3">
         <author>@Model.Author</author>

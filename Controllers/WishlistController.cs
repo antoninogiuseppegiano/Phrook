@@ -36,10 +36,10 @@ namespace Phrook.Controllers
 			catch (BookNotFoundException)
 			{
 				TempData["ErrorMessage"] = "Non è stato possibile rimuovere il libro dalla lista dei desideri.";
-				return RedirectToAction(nameof(Index));
+				return RedirectToAction(Request.GetTypedHeaders().Referer.ToString());
 			}
 			TempData["ConfirmationMessage"] = "Libro rimosso dalla lista dei desideri.";
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction("OverviewById", "Books",  new { id = bookId });
 		}
 
 		public async Task<IActionResult> AddToWishlist(string bookId) 
@@ -54,7 +54,7 @@ namespace Phrook.Controllers
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
 			TempData["ConfirmationMessage"] = "Libro aggiunto alla lista dei desideri.";
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction("OverviewById", "Books",  new { id = bookId });
 		}
 	}	
 }
