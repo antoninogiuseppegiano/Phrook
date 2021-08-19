@@ -26,11 +26,11 @@ namespace Phrook.Models.InputModels
 			this.Offset = (Page - 1) * this.Limit;
 		}
 		public string Search { get; set; }
-		public int Page { get; }
+		public int Page { get; set; }
 		public string OrderBy { get; }
 		public bool Ascending { get; }
 		public int Limit { get; }
-		public int Offset { get; }
+		public int Offset { get; set; }
 
 	}
 }

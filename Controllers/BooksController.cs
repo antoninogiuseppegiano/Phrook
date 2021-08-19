@@ -162,14 +162,6 @@ namespace Phrook.Controllers
 				books = new() { Results = new() }; ;
 			}
 
-			//TODO: mettere insieme i risultati delle due chiamate (prendere id unici)
-
-			//List<SearchedBookViewModel> paginated = new();
-			// for(int i = 0; i < input.Limit; i++) {
-			// 	if(i + input.Offset < books.Results.Count) {
-			// 		paginated.Add(books.Results[i+input.Offset]);
-			// 	}
-			// }
 			foreach (var b in books.Results)
 			{
 				bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, b.Id);

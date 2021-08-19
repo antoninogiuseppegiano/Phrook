@@ -126,12 +126,22 @@ namespace Phrook.Models.Services.Application
 				ReadingState = libraryBook.ReadingState
 			});
 
+			int totalCount = await query.CountAsync();
+			if(totalCount == model.Offset)
+			{
+				model.Page--;
+				model.Offset -= model.Limit;
+			}
+			else
+			{
+				model.Offset = (totalCount - totalCount%model.Limit) - model.Limit;
+			}
+
 			List<BookViewModel> books = await query
 			.Skip(model.Offset)
 			.Take(model.Limit)
 			.ToListAsync();
 
-			int totalCount = await query.CountAsync();
 			ListViewModel<BookViewModel> result = new ()
 			{
 				Results = books,
