@@ -16,10 +16,8 @@ namespace Phrook.Models.Services.Application
 	public class EfCoreUserService : IUserService
 	{
 		private readonly PhrookDbContext dbContext;
-		private readonly IHttpContextAccessor httpContextAccessor;
-		public EfCoreUserService(IHttpContextAccessor httpContextAccessor, PhrookDbContext dbContext)
+		public EfCoreUserService(PhrookDbContext dbContext)
 		{
-			this.httpContextAccessor = httpContextAccessor;
 			this.dbContext = dbContext;
 
 		}

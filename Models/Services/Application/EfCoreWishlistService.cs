@@ -18,14 +18,12 @@ namespace Phrook.Models.Services.Application
 	public class EfCoreWishlistService : IWishlistService
 	{
 		private readonly PhrookDbContext dbContext;
-		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IGoogleBooksClient _gbClient;
 		private readonly IBookService bookService;
-		public EfCoreWishlistService(IGoogleBooksClient googleBooksClient, IBookService bookService, IHttpContextAccessor httpContextAccessor, PhrookDbContext dbContext)
+		public EfCoreWishlistService(IGoogleBooksClient googleBooksClient, IBookService bookService, PhrookDbContext dbContext)
 		{
 			this.bookService = bookService;
 			this._gbClient = googleBooksClient;
-			this.httpContextAccessor = httpContextAccessor;
 			this.dbContext = dbContext;
 		}
 		public async Task<ListViewModel<WishlistViewModel>> GetBooksAsync(string currentUserId, BookListInputModel input)

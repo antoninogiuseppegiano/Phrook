@@ -25,18 +25,15 @@ namespace Phrook.Models.Services.Application
 
 		private readonly IOptionsMonitor<BooksOptions> booksOptions;
 		private readonly ILogger<EfCoreBookService> logger;
-		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IGoogleBooksClient _gbClient;
 
 		public EfCoreBookService(
 			IGoogleBooksClient googleBooksClient,
-			IHttpContextAccessor httpContextAccessor,
 			PhrookDbContext dbContext,
 			IOptionsMonitor<BooksOptions> booksOptions,
 			ILogger<EfCoreBookService> logger)
 		{
 			this._gbClient = googleBooksClient;
-			this.httpContextAccessor = httpContextAccessor;
 			this.logger = logger;
 			this.booksOptions = booksOptions;
 			this.dbContext = dbContext;
