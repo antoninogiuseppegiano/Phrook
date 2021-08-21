@@ -52,9 +52,18 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Index(string userId, BookListInputModel input)
 		{
+			
 			if (await userService.IsVisible(userId))
 			{
-				string fullName = await userService.GetUserFullName(userId);
+				string fullName;
+				try
+				{
+					fullName = await userService.GetUserFullName(userId);
+				}
+				catch
+				{
+					throw new UserNotFoundException(userId);
+				}
 				ViewData["Filter"] = input.Search;
 				ListViewModel<BookViewModel> books = await userService.GetUserBooks(userId, input);
 

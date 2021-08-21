@@ -124,6 +124,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
 				user.NormalizedFullName = user.FullName.ToLower();
+				user.Visibility = false;
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {

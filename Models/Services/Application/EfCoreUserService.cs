@@ -50,18 +50,7 @@ namespace Phrook.Models.Services.Application
 					if (input.Ascending) { baseQuery = baseQuery.OrderBy(libraryBook => libraryBook.Tag); }
 					else { baseQuery = baseQuery.OrderByDescending(libraryBook => libraryBook.Tag); }
 					break;
-			}
-
-			// try
-			// {
-			// 	string _ = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			// }
-			// catch (NullReferenceException)
-			// {
-			// 	throw new UserUnknownException();
-			// }
-
-			
+			}			
 
 			string searchString = input.Search.ToLower();
 			IQueryable<BookViewModel> query = baseQuery
@@ -82,15 +71,16 @@ namespace Phrook.Models.Services.Application
 			});
 
 			int totalCount = await query.CountAsync();
-			if(totalCount == input.Offset)
+			if(totalCount <= input.Offset)
 			{
 				input.Page--;
-				input.Offset -= input.Limit;
-			}
-			else
-			{
 				input.Offset = (totalCount - totalCount%input.Limit) - input.Limit;
+
 			}
+			// else if (totalCount <= input.Offset)
+			// {
+			// 	input.Offset = (totalCount - totalCount%input.Limit) - input.Limit;
+			// }
 
 			List<BookViewModel> books = await query
 			.Skip(input.Offset)
@@ -110,7 +100,7 @@ namespace Phrook.Models.Services.Application
 			userId = userId?.Trim();
 			if(string.IsNullOrWhiteSpace(userId))
 			{
-				throw new UserUnknownException();
+				throw new ArgumentException();
 			}
 			string fullName = await dbContext.Users
 			.AsNoTracking().Where(user => user.Id == userId)
@@ -151,12 +141,21 @@ namespace Phrook.Models.Services.Application
 			userId = userId?.Trim();
 			if(string.IsNullOrWhiteSpace(userId))
 			{
-				throw new UserUnknownException();
+				throw new ArgumentException();
 			}
-			bool isVisible = await dbContext.Users
-			.AsNoTracking().Where(user => user.Id == userId)
-			.Select(user => user.Visibility).SingleOrDefaultAsync();
-			return isVisible;
+
+			try
+			{
+				ApplicationUser user = await dbContext.Users
+					.AsNoTracking()
+					.Where(user => user.Id == userId)
+					.SingleAsync();
+				return user.Visibility;
+			}
+			catch
+			{
+				throw new UserNotFoundException(userId);
+			}
 		}
 	}
 }

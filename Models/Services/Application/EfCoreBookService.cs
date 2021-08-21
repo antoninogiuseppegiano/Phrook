@@ -124,15 +124,15 @@ namespace Phrook.Models.Services.Application
 			});
 
 			int totalCount = await query.CountAsync();
-			if(totalCount == model.Offset)
+			if(totalCount <= model.Offset)
 			{
 				model.Page--;
 				model.Offset -= model.Limit;
 			}
-			else
-			{
-				model.Offset = (totalCount - totalCount%model.Limit) - model.Limit;
-			}
+			// else
+			// {
+			// 	model.Offset = (totalCount - totalCount%model.Limit) - model.Limit;
+			// }
 
 			List<BookViewModel> books = await query
 			.Skip(model.Offset)
@@ -301,7 +301,15 @@ namespace Phrook.Models.Services.Application
 			LibraryBook libraryBook;
 			if (!(await IsBookStoredInBooks(bookId)))
 			{
-				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
+				BookOverviewViewModel overview = new(); 
+				try 
+				{
+					overview = await _gbClient.GetBookByIdAsync(bookId);
+				}
+				catch
+				{
+					throw new BookNotAddedException(bookId);
+				}
 				if(string.IsNullOrWhiteSpace(overview.Description))
 				{
 					overview.Description = "Nessuna descrizione";

@@ -211,8 +211,16 @@ namespace Phrook.Controllers
 				ViewData["Title"] = Utility._getShortTitle(book.Title);
 				return RedirectToAction(nameof(Detail), new { id = book.Id });
 			}
-
-			string bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
+			
+			string bookId = "";
+			try
+			{
+				bookId = await _gbClient.GetIdFromISBNAsync(searchISBN);
+			}
+			catch
+			{
+				throw new BookNotFoundException(searchISBN);
+			}
 			BookOverviewViewModel overviewViewModel;
 
 			try
@@ -221,7 +229,7 @@ namespace Phrook.Controllers
 			}
 			catch (ApiException)
 			{
-				overviewViewModel = null;
+				//overviewViewModel = null;
 				throw new BookNotFoundException(searchISBN);
 			}
 

@@ -49,6 +49,8 @@
         </section>
     </div>
     <div class="col-md-6 col-md-offset-2">
+	@if ((Model.ExternalLogins?.Count ?? 0) != 0)
+	{
         <section>
             <h4>Utilizza un altro servizio per accedere.</h4>@* Use another service to log in. *@
             <hr />
@@ -78,6 +80,7 @@
                 }
             }
         </section>
+	}
     </div>
 </div>
 

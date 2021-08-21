@@ -83,7 +83,15 @@ namespace Phrook.Models.Services.Application
 			Wishlist wishlist;
 			if (!(await bookService.IsBookStoredInBooks(bookId)))
 			{
-				BookOverviewViewModel overview = await _gbClient.GetBookByIdAsync(bookId);
+				BookOverviewViewModel overview = new();
+				try
+				{
+					overview = await _gbClient.GetBookByIdAsync(bookId);
+				}
+				catch
+				{
+					throw new BookNotAddedException(bookId);
+				}
 
 				wishlist = new()
 				{

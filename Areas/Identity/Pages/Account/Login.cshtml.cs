@@ -19,7 +19,7 @@ namespace Phrook.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager, 
@@ -27,7 +27,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+			_signInManager = signInManager;
             _logger = logger;
         }
 
@@ -41,7 +41,7 @@ namespace Phrook.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
-        public class InputModel
+		public class InputModel
         {
             [Required(ErrorMessage = "L'email è obbligatoria")]
             [EmailAddress(ErrorMessage = "Deve essere un indirizzo email valido")]
@@ -51,7 +51,7 @@ namespace Phrook.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name = "Ricordami?")]/* Remember me? */
+            [Display(Name = "Ricordami")]/* Remember me? */
             public bool RememberMe { get; set; }
         }
 

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Phrook.Models.Exceptions;
 using Phrook.Models.InputModels;
 using Phrook.Models.Services.Application;
-using Phrook.Models.Services.HttpClients;
 using Phrook.Models.ViewModels;
 
 namespace Phrook.Controllers
@@ -14,12 +13,10 @@ namespace Phrook.Controllers
 	public class WishlistController : Controller
 	{
 		private readonly IWishlistService wishlistService;
-		private readonly IGoogleBooksClient gbClient;
 		private readonly IHttpContextAccessor httpContextAccessor;
-		public WishlistController(IHttpContextAccessor httpContextAccessor, IWishlistService wishlistService, IGoogleBooksClient gbClient)
+		public WishlistController(IHttpContextAccessor httpContextAccessor, IWishlistService wishlistService)
 		{
 			this.httpContextAccessor = httpContextAccessor;
-			this.gbClient = gbClient;
 			this.wishlistService = wishlistService;
 		}
 

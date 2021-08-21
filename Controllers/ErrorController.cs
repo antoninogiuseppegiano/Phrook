@@ -19,6 +19,20 @@ namespace Phrook.Controllers
 					Response.StatusCode = 404;
 					return View("BookNotFound");
 
+				case BookNotAddedException e:
+					ViewData["Title"] = "Libro non aggiunto";
+					Response.StatusCode = 404;
+					return View("BookNotAdded");
+
+				case UserNotFoundException e:
+					ViewData["Title"] = "Utente non trovato";
+					Response.StatusCode = 404;
+					return View("UserNotFound");
+
+				case UserUnknownException e:
+					Response.StatusCode = 404;
+					return Redirect("/Identity/Account/Login");
+					
 				default:
 					ViewData["Title"] = "Errore";
 					Response.StatusCode = 404;
