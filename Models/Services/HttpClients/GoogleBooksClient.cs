@@ -31,7 +31,6 @@ namespace Phrook.Models.Services.HttpClients
 			string url = googleBooksApiOptions.CurrentValue.Url;
 			switch (requestType)
 			{
-				//TODO: sanitization
 				case GoogleBooksApiType.Id:
 					{
 						return $"{url}/{value}";
@@ -50,7 +49,6 @@ namespace Phrook.Models.Services.HttpClients
 		private string GetApiUrl(string title, string author)
 		{
 			string url = googleBooksApiOptions.CurrentValue.Url;
-			//TODO: sanitization
 			bool isTitle = !string.IsNullOrWhiteSpace(title);
 			bool isAuthor = !string.IsNullOrWhiteSpace(author);
 			if(isTitle && isAuthor) 
