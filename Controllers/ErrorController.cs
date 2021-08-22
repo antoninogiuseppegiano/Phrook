@@ -12,7 +12,6 @@ namespace Phrook.Controllers
 		public IActionResult Index() {
 			var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 			
-			//TODO: spostare in servizio applicativo ErrorViewSelector
 			switch (feature.Error) {
 				case BookNotFoundException e:
 					ViewData["Title"] = "Libro non trovato";
@@ -38,9 +37,6 @@ namespace Phrook.Controllers
 					Response.StatusCode = 404;
 					return View();
 			}
-
-			
-			
 		}
     }
 }

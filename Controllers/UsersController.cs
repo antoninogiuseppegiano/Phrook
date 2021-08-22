@@ -19,6 +19,7 @@ namespace Phrook.Controllers
 			this.httpContextAccessor = httpContextAccessor;
 			this.userService = userService;
 		}
+		
 		public async Task<IActionResult> Search(string searchUser)
 		{
 			ViewData["SearchUser"] = searchUser;
@@ -52,7 +53,6 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Index(string userId, BookListInputModel input)
 		{
-			
 			if (await userService.IsVisible(userId))
 			{
 				string fullName;
@@ -88,6 +88,5 @@ namespace Phrook.Controllers
 				return View(viewModel);
 			}
 		}
-
 	}
 }

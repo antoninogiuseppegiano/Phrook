@@ -65,7 +65,6 @@ namespace Phrook.Controllers
 			BookDetailViewModel book;
 			book = await _bookService.GetBookByIdAsync(currentUserId, id);
 
-			//return the view /views/Books/Index
 			ViewData["Title"] = Utility._getShortTitle(book.Title);
 			return View(book);
 		}
@@ -84,7 +83,6 @@ namespace Phrook.Controllers
 			}
 
 			EditBookInputModel inputModel = await _bookService.GetBookForEditingAsync(currentUserId, id);
-			//TODO ricarica pagina
 			ViewData["Title"] = "Modifica libro";
 			return View(inputModel);
 		}
@@ -123,7 +121,6 @@ namespace Phrook.Controllers
 				}
 			}
 
-			//TODO ricarica pagina
 			ViewData["Title"] = "Modifica libro";
 			return View(inputModel);
 		}
@@ -149,9 +146,6 @@ namespace Phrook.Controllers
 			}
 
 			ListViewModel<SearchedBookViewModel> books;
-
-			//TODO: chiamare servizio che cerca tra i libri posseduti dall'utente in db  ????
-			//books = await _bookService.GetBooksByTitleAuthorAsync(input);
 
 			try
 			{
@@ -300,7 +294,6 @@ namespace Phrook.Controllers
 				}
 			}
 
-
 			if (overviewViewModel is not null)
 			{
 				bool isInLibrary = await _bookService.IsBookAddedToLibrary(currentUserId, overviewViewModel.Id);
@@ -319,8 +312,6 @@ namespace Phrook.Controllers
 			{
 				throw new BookNotFoundException(id);
 			}
-
-
 		}
 
 		public async Task<IActionResult> AddToLibrary(string id)
