@@ -71,11 +71,20 @@ namespace Phrook.Models.Services.Application
 			});
 
 			int totalCount = await query.CountAsync();
-			if(totalCount <= input.Offset)
+			if(totalCount == input.Offset)
 			{
+				input.Offset -= input.Limit;
 				input.Page--;
-				input.Offset = (totalCount - totalCount%input.Limit) - input.Limit;
-
+			}
+			else if(totalCount < input.Offset)
+			{
+				var newOffset = (totalCount - totalCount%input.Limit);
+				if(newOffset == input.Offset)
+				{
+					newOffset -= input.Limit;
+				}
+				input.Offset =  newOffset;
+				input.Page = input.Offset/input.Limit;
 			}
 			// else if (totalCount <= input.Offset)
 			// {

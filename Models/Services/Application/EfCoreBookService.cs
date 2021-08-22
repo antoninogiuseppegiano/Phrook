@@ -124,10 +124,20 @@ namespace Phrook.Models.Services.Application
 			});
 
 			int totalCount = await query.CountAsync();
-			if(totalCount <= model.Offset)
+			if(totalCount == model.Offset)
 			{
-				model.Page--;
 				model.Offset -= model.Limit;
+				model.Page--;
+			}
+			else if(totalCount < model.Offset)
+			{
+				var newOffset = (totalCount - totalCount%model.Limit);
+				if(newOffset == model.Offset)
+				{
+					newOffset -= model.Limit;
+				}
+				model.Offset =  newOffset;
+				model.Page = model.Offset/model.Limit;
 			}
 			// else
 			// {
