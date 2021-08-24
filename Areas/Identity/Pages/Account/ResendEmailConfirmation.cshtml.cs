@@ -62,11 +62,19 @@ namespace Phrook.Areas.Identity.Pages.Account
                 pageHandler: null,
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
+			try
+			{
+				await _emailSender.SendEmailAsync(
                 Input.Email,
                 "Conferma la tua email",/* Confirm your email */
                 // $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                 $"Per favore, conferma il tuo account <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliccando qui</a>.");
+			}
+			catch
+			{
+				ModelState.AddModelError(string.Empty, "Non è stato possibile inviare l'email. Riprova più tardi.");
+            	return Page();
+			}
 
             ModelState.AddModelError(string.Empty, "Ti è stato inviato un link di conferma via email. Per favore, controlla la tua email.");/* Verification email sent. Please check your email. */
             return Page();
