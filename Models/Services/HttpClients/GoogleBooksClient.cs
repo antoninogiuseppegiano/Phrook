@@ -32,18 +32,11 @@ namespace Phrook.Models.Services.HttpClients
 			switch (requestType)
 			{
 				case GoogleBooksApiType.Id:
-					{
-						return $"{url}/{value}";
-					}
+					return $"{url}/{value}";
 				case GoogleBooksApiType.ISBN:
-					{
-						return $"{url}?q=+isbn:{value}";
-
-					}
+					return $"{url}?q=+isbn:{value}";
 				default:
-					{
-						throw new ApiException(value);
-					}
+					throw new ApiException(value);
 			}
 		}
 		private string GetApiUrl(string title, string author)
@@ -69,9 +62,12 @@ namespace Phrook.Models.Services.HttpClients
 		{
 			try
 			{
+				//consume API
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(id, GoogleBooksApiType.Id));
+				//deserialize response
 				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByIdResponseModel>(responseStream);
 
+				//sanitazing
 				string image = deserialized.VolumeInfo.ImageLinks == null ? "#" : deserialized.VolumeInfo.ImageLinks.Thumbnail.ToString();
 				BookOverviewViewModel viewModel = new()
 				{
@@ -95,7 +91,9 @@ namespace Phrook.Models.Services.HttpClients
 		{
 			try
 			{
+				//consume API
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(isbn, GoogleBooksApiType.ISBN));
+				//deserialize response
 				var bookId = (await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream)).Items.First().Id;
 				return bookId;
 			}
@@ -112,23 +110,31 @@ namespace Phrook.Models.Services.HttpClients
 			{
 				title = title?.Trim();
 				author = author?.Trim();
+
+				//sanitazing
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(title, author));
+				//deserialize response
 				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByParametersResponseModel>(responseStream);
+				
 				ListViewModel<SearchedBookViewModel> viewModel = new() { Results = new() };
 				string isbn, image, authors;
+
 				if (deserialized.Items == null)
 				{
 					return viewModel;
 				}
+
 				foreach (var Item in deserialized.Items)
 				{
+					//sanitazing
 					if (Item.VolumeInfo.IndustryIdentifiers != null && Item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Any())
 					{
 						isbn = Item.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Select(ii => ii.Identifier).SingleOrDefault();
 					}
-					else continue;
+					else continue; //if no ISBN, book is discarded
 
 					image = Item.VolumeInfo.ImageLinks == null ? "#" : Item.VolumeInfo.ImageLinks.Thumbnail.ToString();
+
 					if (Item.VolumeInfo.Authors != null && Item.VolumeInfo.Authors.Any())
 					{
 						authors = Item.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next).Substring(3);
@@ -138,7 +144,6 @@ namespace Phrook.Models.Services.HttpClients
 						authors = "Sconosciuto";
 					}
 
-					
 					viewModel.Results.Add(
 						new SearchedBookViewModel
 						{

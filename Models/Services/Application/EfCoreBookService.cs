@@ -45,24 +45,27 @@ namespace Phrook.Models.Services.Application
 			BookDetailViewModel book;
 			try
 			{
+				//get the record from LibraryBooks table
 				var query = dbContext.LibraryBooks
 				.AsNoTracking()
 				.Where(libraryBook => libraryBook.BookId == id && libraryBook.UserId == currentUserId)
 				.Select(libraryBook =>
-				new BookDetailViewModel
-				{
-					Id = libraryBook.BookId,
-					ISBN = libraryBook.Book.Isbn,
-					Title = libraryBook.Book.Title,
-					Author = libraryBook.Book.Author,
-					ImagePath = libraryBook.Book.ImagePath,
-					Rating = libraryBook.Rating,
-					Tag = libraryBook.Tag,
-					ReadingState = libraryBook.ReadingState,
-					Description = libraryBook.Book.Description,
-					InitialTime = libraryBook.InitialTime,
-					FinalTime = libraryBook.FinalTime
-				});
+					new BookDetailViewModel
+					{
+						Id = libraryBook.BookId,
+						ISBN = libraryBook.Book.Isbn,
+						Title = libraryBook.Book.Title,
+						Author = libraryBook.Book.Author,
+						ImagePath = libraryBook.Book.ImagePath,
+						Rating = libraryBook.Rating,
+						Tag = libraryBook.Tag,
+						ReadingState = libraryBook.ReadingState,
+						Description = libraryBook.Book.Description,
+						InitialTime = libraryBook.InitialTime,
+						FinalTime = libraryBook.FinalTime
+					}
+				);
+				//there must be exactly one result
 				book = await query.SingleAsync();
 			}
 			catch (InvalidOperationException)
@@ -78,9 +81,10 @@ namespace Phrook.Models.Services.Application
 		{
 			logger.LogInformation("Book list requested.");
 			model.Search = model.Search?.Trim();
-			//Ricerca
+
 			IQueryable<LibraryBook> baseQuery = dbContext.LibraryBooks;
 
+			//invoking the right sorting method (ascending or descending) and providing it the right field to sort
 			switch (model.OrderBy)
 			{
 				case "Title":
@@ -105,10 +109,11 @@ namespace Phrook.Models.Services.Application
 					break;
 			}
 
+			//lowering string, so we can search through NormalizedTitle (it is also lower)
 			string searchString = model.Search.ToLower();
+
 			IQueryable<BookViewModel> query = baseQuery
 			.AsNoTracking()
-			//TODO: implementare fuzzy
 			.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.Book.NormalizedTitle.Contains(searchString))
 			.Select(libraryBook =>
 			new BookViewModel
@@ -124,6 +129,7 @@ namespace Phrook.Models.Services.Application
 			});
 
 			int totalCount = await query.CountAsync();
+			//sanitizing values
 			if(totalCount == model.Offset)
 			{
 				model.Offset -= model.Limit;
@@ -139,11 +145,8 @@ namespace Phrook.Models.Services.Application
 				model.Offset =  newOffset;
 				model.Page = model.Offset/model.Limit;
 			}
-			// else
-			// {
-			// 	model.Offset = (totalCount - totalCount%model.Limit) - model.Limit;
-			// }
 
+			//pagination
 			List<BookViewModel> books = await query
 			.Skip(model.Offset)
 			.Take(model.Limit)
@@ -182,7 +185,7 @@ namespace Phrook.Models.Services.Application
 					InitialTime = libraryBook.InitialTime,
 					FinalTime = libraryBook.FinalTime
 				})
-				.SingleAsync();
+				.SingleAsync(); //there must be exactly one result
 			}
 			catch (InvalidOperationException)
 			{
@@ -198,13 +201,16 @@ namespace Phrook.Models.Services.Application
 			LibraryBook book = await dbContext.LibraryBooks
 				.Where(librarybook => librarybook.UserId == currentUserId && librarybook.BookId == inputModel.BookId)
 				.Include(libraryBook => libraryBook.Book)
-				.FirstOrDefaultAsync();
+				.SingleAsync(); //there must be exactly one result
 
+			//edit book
 			book.ChangeRating(inputModel.Rating);
+
 			if(!string.IsNullOrEmpty(inputModel.Tag))
 			{
 				book.ChangeTag(inputModel.Tag);
 			}
+
 			if(!string.IsNullOrEmpty(inputModel.ReadingState))
 			{
 				book.ChangeReadingState(inputModel.ReadingState);
@@ -212,22 +218,22 @@ namespace Phrook.Models.Services.Application
 
 			switch(inputModel.ReadingState)
 			{
-				case "0":
-					book.ChangeInitialTime(DateTime.MinValue.Date);
-					book.ChangeFinalTime(DateTime.MinValue.Date);
+				case "0": //NotRead
+					book.ChangeInitialTime(DateTime.MinValue.Date); //default date
+					book.ChangeFinalTime(DateTime.MinValue.Date); //default date
 					break;
-				case "1":
+				case "1": //Reading
 						book.ChangeInitialTime(inputModel.InitialTime);
-					book.ChangeFinalTime(DateTime.MinValue.Date);
+					book.ChangeFinalTime(DateTime.MinValue.Date); //default date
 					break;
-				case "2":
-				case "3":
+				case "2": //Interrupted
+				case "3": //Read
 						book.ChangeInitialTime(inputModel.InitialTime);
 						book.ChangeFinalTime(inputModel.FinalTime);
 					break;
 				default:
-					book.ChangeInitialTime(DateTime.MinValue.Date);
-					book.ChangeFinalTime(DateTime.MinValue.Date);
+					book.ChangeInitialTime(DateTime.MinValue.Date); //default date
+					book.ChangeFinalTime(DateTime.MinValue.Date); //default date
 					break;
 				
 			}
@@ -285,7 +291,7 @@ namespace Phrook.Models.Services.Application
 					RowVersion = libraryBook.RowVersion
 				});
 
-				EditBookInputModel book = await query.SingleAsync();
+				EditBookInputModel book = await query.SingleAsync(); //there must be exactly one result
 				return book;
 			}
 			catch (InvalidOperationException)
@@ -311,16 +317,22 @@ namespace Phrook.Models.Services.Application
 			// 	throw new TooManyRowsException(affectedRows);
 			// }
 			
-			LibraryBook libraryBook = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).SingleOrDefaultAsync();
-            if (libraryBook == null)
+			LibraryBook libraryBook = await dbContext.LibraryBooks
+				.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId)
+				.SingleOrDefaultAsync(); //there must be exactly one result or returns null
+            
+			if (libraryBook == null)
             {
                 throw new BookNotFoundException(bookId);
             }
+
 			dbContext.Remove(libraryBook);
             await dbContext.SaveChangesAsync();
 
-			//Per avere db più snello, rimuove riga del db se nessun utente ha più quel libro
-			bool isStillInLibrary = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.BookId == bookId).CountAsync() > 0;
+			//For leaner db, remove db row if no user has that book anymore
+			bool isStillInLibrary = await dbContext.LibraryBooks
+				.Where(libraryBook => libraryBook.BookId == bookId)
+				.CountAsync() > 0;
 			if(!isStillInLibrary)
 			{
 				//EF Core Plus cannot work with ObjectContext as DbContext (mocked in testing)
@@ -338,11 +350,15 @@ namespace Phrook.Models.Services.Application
 				// 	throw new TooManyRowsException(affectedRows);
 				// }
 
-				Book book = await dbContext.Books.Where(book => book.BookId == bookId).SingleOrDefaultAsync();
+				Book book = await dbContext.Books
+					.Where(book => book.BookId == bookId)
+					.SingleOrDefaultAsync(); //there must be exactly one result or returns null
+
 				if (book == null)
 				{
 					throw new BookNotFoundException(bookId);
 				}
+
 				dbContext.Remove(book);
 				await dbContext.SaveChangesAsync();
 			}
@@ -354,6 +370,7 @@ namespace Phrook.Models.Services.Application
 			LibraryBook libraryBook;
 			if (!(await IsBookStoredInBooks(bookId)))
 			{
+				//book is not in Books table
 				BookOverviewViewModel overview = new(); 
 				try 
 				{
@@ -363,20 +380,14 @@ namespace Phrook.Models.Services.Application
 				{
 					throw new BookNotAddedException(bookId);
 				}
+
 				if(string.IsNullOrWhiteSpace(overview.Description))
 				{
 					overview.Description = "Nessuna descrizione";
 				}
+
 				Book book = new(overview.Id, overview.ISBN, overview.Title, overview.Author, overview.ImagePath, overview.Description);
 				dbContext.Add(book);
-				// try
-				// {
-				// 	await dbContext.SaveChangesAsync();
-				// }
-				// catch (DbUpdateException)
-				// {
-				// 	throw new BookNotAddedException(bookId);
-				// }
 			}
 
 			libraryBook = new(bookId, currentUserId);
@@ -402,7 +413,11 @@ namespace Phrook.Models.Services.Application
 			// {
 			// 	throw new TooManyRowsException(affectedRows);
 			// }
-			Wishlist wishlist = await dbContext.Wishlist.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).SingleOrDefaultAsync();
+			
+			//Removing from wishlist
+			Wishlist wishlist = await dbContext.Wishlist
+				.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId)
+				.SingleOrDefaultAsync(); //there must be exactly one result or returns null
             if (wishlist != null)
             {
                	dbContext.Remove(wishlist);
@@ -441,7 +456,7 @@ namespace Phrook.Models.Services.Application
 					ImagePath = book.ImagePath,
 					Description = book.Description
 				});
-				book = await query.SingleAsync();
+				book = await query.SingleAsync(); //there must be exactly one result
 			}
 			catch (InvalidOperationException)
 			{

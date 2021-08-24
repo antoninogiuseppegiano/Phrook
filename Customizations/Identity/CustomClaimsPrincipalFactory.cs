@@ -12,6 +12,7 @@ namespace Phrook.Customizations.Identity
 
 		protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
 		{
+			//generates a claim (a pair key-value) that contains the user's fullname and adds that to the existing ones
 			ClaimsIdentity identity = await base.GenerateClaimsAsync(user);
 			identity.AddClaim(new Claim("FullName", user.FullName));
 			return identity;

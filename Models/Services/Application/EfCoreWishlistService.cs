@@ -31,7 +31,6 @@ namespace Phrook.Models.Services.Application
 			
 			IQueryable<WishlistViewModel> query = dbContext.Wishlist
 			.AsNoTracking()
-			//TODO: implementare fuzzy
 			.Where(wishlist => wishlist.UserId == currentUserId)
 			.Select(wishlist =>
 			new WishlistViewModel
@@ -92,6 +91,7 @@ namespace Phrook.Models.Services.Application
 			Wishlist wishlist;
 			if (!(await bookService.IsBookStoredInBooks(bookId)))
 			{
+				//book not in Books table -> Google API
 				BookOverviewViewModel overview = new();
 				try
 				{

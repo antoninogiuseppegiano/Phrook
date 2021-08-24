@@ -29,16 +29,9 @@ namespace Phrook.Controllers
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
 
-			string currentUserId = "";
-			try
-			{
-				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			getCurrentUserId(out string currentUserId);
 
+			//get users list
 			ListViewModel<SearchedUserViewModel> users = await userService.GetUsers(currentUserId, searchUser);
 
 			SearchUserListViewModel result = new()
@@ -55,16 +48,21 @@ namespace Phrook.Controllers
 		{
 			if (await userService.IsVisible(userId))
 			{
+				//user is visible
 				string fullName;
 				try
 				{
+					//get the searched user's name
 					fullName = await userService.GetUserFullName(userId);
 				}
 				catch
 				{
 					throw new UserNotFoundException(userId);
 				}
+
 				ViewData["Filter"] = input.Search;
+
+				//get user's book list
 				ListViewModel<BookViewModel> books = await userService.GetUserBooks(userId, input);
 
 				BookListOfUserViewModel viewModel = new()
@@ -80,12 +78,26 @@ namespace Phrook.Controllers
 			}
 			else
 			{
+				//user's not visible
 				BookListOfUserViewModel viewModel = new()
 				{
 					UserId = ""
 				};
 				ViewData["Title"] = "Utente non trovato";
 				return View(viewModel);
+			}
+		}
+
+		private void getCurrentUserId(out string currentUserId)
+		{
+			try
+			{
+				//ClaimType.NameIdentifier is the id of the claim needed (the user id)
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
 			}
 		}
 	}

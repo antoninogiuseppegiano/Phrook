@@ -13,6 +13,7 @@ namespace Phrook.Models.InputModels
 		{
 			if(!orderOptions.Allow.Contains(orderBy)) 
 			{
+				//order not specified, stting default
 				orderBy = orderOptions.By;
 				ascending = orderOptions.Ascending;
 			}

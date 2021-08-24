@@ -24,12 +24,14 @@ namespace Phrook.Models.Services.Infrastructure
             try
             {
                 var options = this.smtpOptionsMonitor.CurrentValue;
+
                 using  var client = new SmtpClient();
                 await client.ConnectAsync(options.Host, options.Port, options.Security);
                 if (!string.IsNullOrEmpty(options.Username))
                 {
                     await client.AuthenticateAsync(options.Username, options.Password);
                 }
+
                 MimeMessage message = new();
                 message.From.Add(MailboxAddress.Parse(options.Sender));
                 message.To.Add(MailboxAddress.Parse(email));
@@ -38,6 +40,9 @@ namespace Phrook.Models.Services.Infrastructure
                 {
                     Text = htmlMessage
                 };
+
+				//using Polly to try again if sending fails 
+				//it tries 3 times, the first one is by default, the others -2- are specified in WaitAndRetryAsync()
 				var policy = Policy
 					.Handle<Exception>()
 					.WaitAndRetryAsync(2, retry => TimeSpan.FromMilliseconds(200));

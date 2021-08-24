@@ -6,6 +6,7 @@ namespace Phrook.Customizations.ExtensionMethods
 {
     public static class EnumExtensionMethods
     {
+		///<summmary>This method returns value in <c>[Description]<c/> annotation.</summary>
          public static string GetDescription(this Enum GenericEnum)
         {
             Type genericEnumType = GenericEnum.GetType();

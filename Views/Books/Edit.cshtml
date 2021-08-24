@@ -80,6 +80,8 @@
 @section Scripts
 {
 	<partial name="_Validation"></partial>
+
+	
 	<script>
 		function setSelect(selectId, stringValue) {
 			let select, opt; 
@@ -105,24 +107,26 @@
 
 		let initial = document.getElementById("InitialTime"),
 				final = document.getElementById("FinalTime");
+
+		//date inputs enabled and displayd only if allowed
 		function displayDateSelectors(){
 			let selectId = 'ReadingState';
 			let value = document.getElementById(selectId).value;
 			switch(value){
-				case "3": //Letto
-				case "2": //Interrotto
+				case "3": //read
+				case "2": //interrupted
 					initial.disabled = false;
 					final.disabled = false;
 					initial.parentElement.style.display = 'block';
 					final.parentElement.style.display = 'block';
 					break;
-				case "1": //In lettura
+				case "1": //reading
 					initial.disabled = false;
 					final.disabled = true;
 					initial.parentElement.style.display = 'block';
 					final.parentElement.style.display = 'none';
 					break;
-				case "0": //Non letto
+				case "0": //read
 					final.disabled = true;
 					initial.disabled = true;
 					initial.parentElement.style.display = 'none';
@@ -137,10 +141,13 @@
 			}
 		}
 
+		//when a readingState is selcted, show/hide date inputs
 		document.getElementById('ReadingState').addEventListener('change', displayDateSelectors);
 
+		@* initialize selects (tag and readingState) *@
 		setSelect('Tag', '@(Model.Tag)');
 		setSelect('ReadingState', '@(Model.ReadingState)');
+
 		if(parseInt(initial.value.substring(0, 4)) < 1900) {
 			initial.value = '@DateTime.Now.ToString("yyyy-MM-dd")';
 		}
@@ -155,6 +162,7 @@
 			final.value = '@Model.FinalTime.ToString("yyyy-MM-dd")';
 		}
 
+		@* initialize date inputs *@
 		displayDateSelectors();
 	</script>
 }

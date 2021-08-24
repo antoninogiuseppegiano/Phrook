@@ -22,16 +22,9 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Index(BookListInputModel input)
 		{
-			string currentUserId = "";
-			try
-			{
-				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			getCurrentUserId(out string currentUserId);
 
+			//get wishlist
 			ListViewModel<WishlistViewModel> books = await wishlistService.GetBooksAsync(currentUserId, input);
 
 			ViewData["Title"] = "Lista dei desideri";
@@ -40,15 +33,7 @@ namespace Phrook.Controllers
 
 		public async Task<IActionResult> Delete(string bookId)
 		{
-			string currentUserId = "";
-			try
-			{
-				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			getCurrentUserId(out string currentUserId);
 
 			try
 			{
@@ -56,24 +41,18 @@ namespace Phrook.Controllers
 			}
 			catch (BookNotFoundException)
 			{
+				//not removed
 				TempData["ErrorMessage"] = "Non è stato possibile rimuovere il libro dalla lista dei desideri.";
 				return RedirectToAction(Request.GetTypedHeaders().Referer.ToString());
 			}
+			//removed
 			TempData["ConfirmationMessage"] = "Libro rimosso dalla lista dei desideri.";
 			return RedirectToAction("OverviewById", "Books", new { id = bookId });
 		}
 
 		public async Task<IActionResult> AddToWishlist(string bookId)
 		{
-			string currentUserId = "";
-			try
-			{
-				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-			}
-			catch (NullReferenceException)
-			{
-				throw new UserUnknownException();
-			}
+			getCurrentUserId(out string currentUserId);
 			
 			try
 			{
@@ -81,11 +60,26 @@ namespace Phrook.Controllers
 			}
 			catch
 			{
+				//not added
 				TempData["ErrorMessage"] = "Non è stato possibile aggiungere il libro alla lista dei desideri.";
 				return Redirect(Request.GetTypedHeaders().Referer.ToString());
 			}
+			//added
 			TempData["ConfirmationMessage"] = "Libro aggiunto alla lista dei desideri.";
 			return RedirectToAction("OverviewById", "Books", new { id = bookId });
+		}
+
+		private void getCurrentUserId(out string currentUserId)
+		{
+			try
+			{
+				//ClaimType.NameIdentifier is the id of the claim needed (the user id)
+				currentUserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			}
+			catch (NullReferenceException)
+			{
+				throw new UserUnknownException();
+			}
 		}
 	}
 }

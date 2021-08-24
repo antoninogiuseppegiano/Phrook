@@ -50,11 +50,13 @@ namespace Phrook.Models.InputModels
 			}
 			if(ReadingState != ((int)Enums.ReadingState.NotRead).ToString())
 			{
+				//check initial time in valid range
 				if(InitialTime.Date > DateTime.Now.Date || InitialTime.Year < 1900){
 					yield return new ValidationResult("La data iniziale non è accettabile.", new[] { nameof(InitialTime) });
 				}
 				if(ReadingState != ((int)Enums.ReadingState.Reading).ToString())
 				{
+					//check initial time in valid range
 					if(InitialTime.Date > FinalTime.Date|| FinalTime.Year < 1900){
 						yield return new ValidationResult("Non puoi finire di leggere un libro prima di iniziarlo.", new[] { nameof(FinalTime) });
 					}

@@ -19,7 +19,7 @@ namespace Phrook.Customizations.TagHelpers
         {
             output.TagName = "a";
 
-            //Imposto i valori del link
+            //setting the link values
             RouteValues["search"] = Input.Search;
             RouteValues["orderby"] = OrderBy;
             RouteValues["ascending"] = (Input.OrderBy == OrderBy ? !Input.Ascending : Input.Ascending).ToString().ToLowerInvariant();
@@ -28,10 +28,10 @@ namespace Phrook.Customizations.TagHelpers
 				RouteValues["userId"] = UserId;
 			}
 
-            //Faccio generare l'output all'AnchorTagHelper
+            //AnchorTagHelper generates the output
             base.Process(context, output);
 
-            //Aggiungo l'indicatore di direzione
+            //adding the direction indicator
             if (Input.OrderBy == OrderBy)
             {
                 var direction = Input.Ascending ? "up" : "down";

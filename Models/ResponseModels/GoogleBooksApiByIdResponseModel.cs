@@ -9,29 +9,29 @@ namespace Phrook.Models.ResponseModels
 
 	public partial class GoogleBooksApiByIdResponseModel
 	{
-		// [JsonPropertyName("kind")]
-		// public string Kind { get; set; }
+		/* [JsonPropertyName("kind")]
+		public string Kind { get; set; } */
 
 		[JsonPropertyName("id")]
 		public string Id { get; set; }
 
-		// [JsonPropertyName("etag")]
-		// public string Etag { get; set; }
+		/* [JsonPropertyName("etag")]
+		public string Etag { get; set; }
 
-		// [JsonPropertyName("selfLink")]
-		// public Uri SelfLink { get; set; }
+		[JsonPropertyName("selfLink")]
+		public Uri SelfLink { get; set; } */
 
 		[JsonPropertyName("volumeInfo")]
 		public VolumeInfo VolumeInfo { get; set; }
 
-		// [JsonPropertyName("layerInfo")]
-		// public LayerInfo LayerInfo { get; set; }
+		/* [JsonPropertyName("layerInfo")]
+		public LayerInfo LayerInfo { get; set; }
 
-		// [JsonPropertyName("saleInfo")]
-		// public SaleInfo SaleInfo { get; set; }
+		[JsonPropertyName("saleInfo")]
+		public SaleInfo SaleInfo { get; set; }
 
-		// [JsonPropertyName("accessInfo")]
-		// public AccessInfo AccessInfo { get; set; }
+		[JsonPropertyName("accessInfo")]
+		public AccessInfo AccessInfo { get; set; } */
 	}
 
 	/*
