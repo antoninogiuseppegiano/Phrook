@@ -14,7 +14,7 @@
         <div class="col-md-3">
             <aside class=" d-flex flex-column align-items-center">
                 <img src="@Model.ImagePath" class="img-fluid book-image mb-3" alt="@Model.Title">
-				<div class="rating d-flex justify-content-center" title="@Model.Rating">
+				<div class="rating d-flex justify-content-center" title="@(Model.Rating == 0 ? "" : Model.Rating)">
                     <rating value="@Model.Rating"></rating>
                 </div>
 				@if(@Model.ReadingState != "Non letto" && !string.IsNullOrWhiteSpace(Model.InitialTime))

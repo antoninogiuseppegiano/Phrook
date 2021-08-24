@@ -9,7 +9,7 @@
         <h2>@Model.Title</h2>
         <author>@Model.Author</author>
     </div>
-	<div class="col-md-2 d-flex align-items-center rating" title="@Model.Rating">
+	<div class="col-md-2 d-flex align-items-center rating" title="@(Model.Rating == 0 ? "" : Model.Rating)">
 		<rating value="@Model.Rating"></rating>	
     </div>
     <div class="col-md-2 d-flex align-items-center">
