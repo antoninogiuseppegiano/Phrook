@@ -1,0 +1,39 @@
+@model SearchBookViewModel
+@{
+	BookOverviewViewModel book = Model.Book;
+}
+<section class="book-detail mt-2">
+    <div class="row">
+		<div class="col-md-3">
+            <aside class="d-flex flex-column align-items-center">
+				@if(!book.IsInLibrary)
+				{
+				<div class="row">
+					<div class="col-md-9 me-0">
+						<form method="post" asp-controller="Books" asp-action="AddToLibrary">
+							<input type="hidden" asp-for="Book.Id" name="id">
+							<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
+						</form>
+					</div>
+					<div class="col-md-3 ms-0">
+						<a class="btn btn-lg @(book.IsInWishlist ? "in-wishlist" : "")" asp-controller="Wishlist" asp-action="@(book.IsInWishlist ? "Delete" : "AddToWishlist")" asp-route-bookId="@Model.Book.Id">
+							<i class="@(book.IsInWishlist ? "fas" : "far") fa-heart"></i>
+						</a>
+					</div>
+				</div>
+				}
+                <img src="@book.ImagePath" class="img-fluid book-image" alt="@book.Title">
+			</aside>
+        </div>
+        <div class="col-md-9">
+			<div class="row">
+				<h1 class="mb-0">@book.Title</h1>
+				<span class="isbn">ISBN: @book.ISBN</span>
+				<author>di @book.Author</author>
+			</div>
+			<div class="row">
+				<p>@Html.Raw(book.Description)</p>
+			</div>
+        </div>
+    </div>
+</section>

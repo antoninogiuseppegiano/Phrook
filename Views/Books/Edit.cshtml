@@ -1,0 +1,169 @@
+@model EditBookInputModel
+
+<section class="book-info">
+	<form method="post" id="editForm">
+		<input type="hidden" asp-for="RowVersion">
+		<div class="row">
+			<div class="col-md-9">
+				<h1>@ViewData["Title"]</h1>
+			</div>
+			<div class="col-md-3 d-flex align-items-center">
+				<button type="submit" class="btn btn-primary btn-lg btn-block">Salva</button>
+				<button class="btn btn-danger btn-lg ms-3" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="fas fa-trash-alt"></i></button>
+			</div>
+		</div>
+		<div class="row">
+            <div class="col-12" asp-validation-summary="All"></div>
+        </div>
+		<input type="hidden" asp-for="BookId">
+		<div class="row">
+            <div class="col-md-9">
+                <div class="form-group">
+                    <label asp-for="Title"></label>
+                    <input type="text" class="form-control form-control-lg" asp-for="Title" readonly="readonly">
+                    <span asp-validation-for="Title"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <aside>
+                    <div class="form-group">
+                        <label asp-for="Rating"></label>
+						<input type="number" step="0.1" min="0" max="5" asp-for="Rating" class="form-control form-control-block">
+						<span asp-validation-for="Rating"></span>
+                    </div>
+					<div class="form-group">
+                        <label asp-for="Tag"></label>
+						<select asp-items="@Html.GetEnumSelectList<Tag>()" asp-for="Tag" class="form-control"></select>
+						<span asp-validation-for="Tag"></span>
+                    </div>
+					<div class="form-group">
+                        <label asp-for="ReadingState"></label>
+						<select asp-items="@Html.GetEnumSelectList<ReadingState>()" asp-for="ReadingState" class="form-control"></select>
+						<span asp-validation-for="ReadingState"></span>
+                    </div>
+					<div class="form-group">
+						<label asp-for="InitialTime"></label>
+						<input type="date" asp-for="InitialTime" min="1900-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@Model.InitialTime.ToString("yyyy-MM-dd")" class="form-control form-control-block">
+						<span asp-validation-for="InitialTime"></span>
+					</div>
+					<div class="form-group">
+						<label asp-for="FinalTime"></label>
+						<input type="date" asp-for="FinalTime" min="1900-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@Model.FinalTime.ToString("yyyy-MM-dd")" class="form-control form-control-block">
+						<span asp-validation-for="FinalTime"></span>
+					</div>
+                </aside>
+            </div>
+        </div>
+	</form>
+	<form method="post" asp-action="Delete" aspr-route-id="@Model.BookId">
+		<div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-title" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="delete-modal-title">Conferma eliminazione</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Stai per rimuovere il libro dalla libreria. Confermi?</p>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+					<button type="submit" asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger">Conferma</button>
+				</div>
+				</div>
+			</div>
+		</div>
+
+	</form>
+</section>
+
+@section Scripts
+{
+	<partial name="_Validation"></partial>
+
+	
+	<script>
+		function setSelect(selectId, stringValue) {
+			let select, opt; 
+			select = document.getElementById(selectId);
+			if(stringValue == null) {
+				opt = document.createElement('option');
+				opt.value = '--Scegli--';
+				opt.innerHTML = '--Scegli--';
+				opt.disabled = true;
+				opt.selected = true;
+				select.appendChild(opt);
+			}
+			else{
+				opt = document.getElementsByTagName('option');
+				for(let i = 0; i < opt.length; i++) {
+					if(opt[i].innerHTML == stringValue) {
+						opt[i].selected = true;
+						break;
+					}
+				}
+			}
+		};
+
+		let initial = document.getElementById("InitialTime"),
+				final = document.getElementById("FinalTime");
+
+		//date inputs enabled and displayd only if allowed
+		function displayDateSelectors(){
+			let selectId = 'ReadingState';
+			let value = document.getElementById(selectId).value;
+			switch(value){
+				case "3": //read
+				case "2": //interrupted
+					initial.disabled = false;
+					final.disabled = false;
+					initial.parentElement.style.display = 'block';
+					final.parentElement.style.display = 'block';
+					break;
+				case "1": //reading
+					initial.disabled = false;
+					final.disabled = true;
+					initial.parentElement.style.display = 'block';
+					final.parentElement.style.display = 'none';
+					break;
+				case "0": //read
+					final.disabled = true;
+					initial.disabled = true;
+					initial.parentElement.style.display = 'none';
+					final.parentElement.style.display = 'none';
+					break;
+				default:
+					initial.disabled = true;
+					final.disabled = true;
+					initial.parentElement.style.display = 'none';
+					final.parentElement.style.display = 'none';
+					break;
+			}
+		}
+
+		//when a readingState is selcted, show/hide date inputs
+		document.getElementById('ReadingState').addEventListener('change', displayDateSelectors);
+
+		@* initialize selects (tag and readingState) *@
+		setSelect('Tag', '@(Model.Tag)');
+		setSelect('ReadingState', '@(Model.ReadingState)');
+
+		if(parseInt(initial.value.substring(0, 4)) < 1900) {
+			initial.value = '@DateTime.Now.ToString("yyyy-MM-dd")';
+		}
+		else{
+			initial.value = '@Model.InitialTime.ToString("yyyy-MM-dd")';
+		}
+		
+		if(parseInt(final.value.substring(0, 4)) < 1900) {
+			final.value = '@DateTime.Now.ToString("yyyy-MM-dd")';
+		}
+		else{
+			final.value = '@Model.FinalTime.ToString("yyyy-MM-dd")';
+		}
+
+		@* initialize date inputs *@
+		displayDateSelectors();
+	</script>
+}
+

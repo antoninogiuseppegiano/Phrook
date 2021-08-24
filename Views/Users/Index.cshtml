@@ -1,0 +1,88 @@
+@model BookListOfUserViewModel
+
+@if(Model.UserId == ""){
+<h1>@ViewData["Title"]</h1>
+<p>Non è stato trovato il libro richiesto.</p>
+<p><a asp-controller="Books" asp-action="Index">Torna alla libreria</a></p>
+}
+else
+{
+<div class="row">
+	<div class="col-md-8">
+		<h1>Libreria di @Model.FullName</h1>
+	</div>
+	
+	<div class="col-md-4 d-flex align-items-center">
+		<form asp-action="Index" method="get">
+			<div class="input-group">
+				<input type="hidden" asp-for="@Model.UserId">
+				<input type="text" name="search" class="form-control" placeholder="Cerca nella libreria" value="@ViewData["Filter"]">
+				<div class="input-group-append">
+					<button><i class="input-group-text fas fa-search"></i></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+
+@if(Model.Books.Results.Count > 0)
+{
+<div class="row d-flex align-items-center">
+	<div class="col-md-1"></div>
+	<div class="col-md-2"><order-link order-by="Title" Input="@Model.Input" user-id="@Model.UserId">Titolo</order-link></div>
+	<div class="col-md-2"><order-link order-by="Author" Input="@Model.Input" user-id="@Model.UserId">Autore</order-link></div>
+	<div class="col-md-2"><order-link order-by="Rating" Input="@Model.Input" user-id="@Model.UserId">Valutazione</order-link></div>
+	<div class="col-md-2"><order-link order-by="Tag" Input="@Model.Input" user-id="@Model.UserId">Tag</order-link></div>
+	<div class="col-md-1"><order-link order-by="ReadingState" Input="@Model.Input" user-id="@Model.UserId">Stato</order-link></div>
+	<div class="col-md-2"></div>
+</div>
+	@foreach (BookViewModel book in Model.Books.Results)
+	{
+	<partial name="Users/_BookLine" model="@book"></partial>
+	}
+}
+else
+{
+	<p class="mt-3">Non è presente alcun libro.</p>
+}
+var booksList = Model.Books;
+var input = Model.Input;
+int totalPages = (int)Math.Ceiling(booksList.TotalCount / (decimal)input.Limit);
+int currentPage = input.Page;
+@if(totalPages > 1) 
+{
+<nav aria-label="Paginazione">
+	<ul class="pagination d-flex justify-content-center mt-3">
+		@if(currentPage > 1) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-search="@Model.Input.Search" asp-route-userId="@Model.UserId" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fa-angle-left"></i></a>
+			</li>
+		}
+		@for(int p = Math.Max(1, currentPage - 4); p <= Math.Min(totalPages, currentPage + 4); p++) 
+		{
+			if(p == currentPage) 
+			{
+				<li class="page-item active" aria-current="page">
+					<a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-userId="@Model.UserId" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p <span class="sr-only">(current)</span></a>
+				</li>
+			}
+			else 
+			{
+				<li class="page-item">
+					<a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-userId="@Model.UserId" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p</a>
+				</li>
+			}
+		}
+		@if(currentPage < totalPages) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-search="@Model.Input.Search" asp-route-userId="@Model.UserId" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fas fa-angle-right"></i></a>
+			</li>
+		}
+	</ul>
+</nav>
+}
+}

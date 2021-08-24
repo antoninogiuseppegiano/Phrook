@@ -1,0 +1,83 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registrati";@* Register *@
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h4>Crea un nuovo profilo.</h4>@* Create a new account. *@
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+			<div class="form-group">
+                <label asp-for="Input.FullName"></label>
+                <input asp-for="Input.FullName" class="form-control" />
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Registrati</button>@* Register *@
+        </form>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+			<div class="row">
+				<h1><b>Phrook</b></h1>
+				<p>
+					Phrook consente di condividere e digitalizzare quello che viene definito “uno dei piaceri della vita”: la lettura.<br />
+					Registrandoti avrai a disposizione un luogo virtuale dove conservare tutti i tuoi libri vengano conservati, come succede nella libreria di casa, sia cartacei che digitali. Che aspetti? Inzia subito!
+				</p>
+			</div>
+			<div class="row">
+            	<h4>Utilizza un altro servizio per registrarti.</h4>@* Use another service to register. *@
+				<hr />
+				@{
+					if ((Model.ExternalLogins?.Count ?? 0) == 0)
+					{
+						<div>
+							<p>
+								@* There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+								for details on setting up this ASP.NET application to support logging in via external services. *@
+								Non sono stati configurati servizi di autenticazione esterni.
+								Questa funzione sarà presto implemenata!
+							</p>
+						</div>
+					}
+					else
+					{
+						<form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+							<div>
+								<p>
+									@foreach (var provider in Model.ExternalLogins)
+									{
+										<button type="submit" class="btn btn-primary mt-3" name="provider" value="@provider.Name" title="Accedi utilizzando il tuo account @provider.DisplayName"@* Log in using your @provider.DisplayName account *@>@provider.DisplayName</button>
+									}
+								</p>
+							</div>
+						</form>
+					}
+				}
+			</div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

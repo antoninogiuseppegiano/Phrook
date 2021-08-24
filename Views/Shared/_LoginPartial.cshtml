@@ -1,0 +1,32 @@
+@inject SignInManager<ApplicationUser> signInManager
+@inject UserManager<ApplicationUser> userManager
+
+@* says if is authenticated via Identity, instead of User.Identity.IsAuthenticated that says only if auth *@
+@if(signInManager.IsSignedIn(User)) 
+{
+//ApplicationUser applicationUser = await userManager.GetUserAsync(User);
+<ul class="navbar-nav me-3">
+	<li class="nav-item">
+		<a class="nav-link active" asp-controller="Wishlist" asp-action="Index" title="Lista dei desideri"><i class="far fa-heart"></i></a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link active" asp-page="/Account/Manage/Index" asp-area="Identity">Ciao @User.FindFirst("FullName").Value!</a>
+	</li>
+	<li class="nav-item active">
+		<form class="form-inline" method="post" asp-page="/Account/Logout" asp-area="Identity">
+			<button type="submit" class="btn text-white">Esci</button>
+		</form>
+	</li>
+</ul>
+}
+else
+{
+<ul class="navbar-nav me-3">
+	<li class="nav-item">
+		<a class="nav-link active" asp-page="/Account/Register" asp-area="Identity">Registrati</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link active" asp-page="/Account/Login" asp-area="Identity">Login</a>
+	</li>
+</ul>
+}

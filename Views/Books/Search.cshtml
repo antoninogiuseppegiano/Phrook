@@ -1,0 +1,58 @@
+@model SearchBookListViewModel
+<h1>Risultati della ricerca</h1>
+
+@{
+	var booksList = Model.Books;
+	var books = booksList.Results;
+	var input = Model.Input;
+}
+
+@if(booksList.TotalCount > 0) {
+	@foreach (SearchedBookViewModel book in books)
+	{
+		<partial name="Books/_SearchBookLine" model="@book"></partial>
+	}
+}
+else
+{
+	<p class="mt-3">La ricerca non ha prodotto nessun risultato.</p>
+	<p><a asp-controller="Books" asp-action="Index">Torna alla libreria</a></p>
+}
+
+@{
+	int totalPages = (int)Math.Ceiling(booksList.TotalCount / (decimal)input.Limit);
+	int currentPage = input.Page;
+}
+@if(totalPages > 1) {
+<nav aria-label="Paginazione">
+	<ul class="pagination d-flex justify-content-center mt-3">
+		@if(currentPage > 1) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-controller="Books" asp-action="Search" asp-route-page="@(currentPage - 1)" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fa-angle-left"></i></a>
+			</li>
+		}
+		@for(int p = Math.Max(1, currentPage - 4); p <= Math.Min(totalPages, currentPage + 4); p++) 
+		{
+			if(p == currentPage) 
+			{
+				<li class="page-item active" aria-current="page">
+					<a class="page-link" asp-controller="Books" asp-action="Search" asp-route-page="@p" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p <span class="sr-only">(current)</span></a>
+				</li>
+			}
+			else 
+			{
+				<li class="page-item">
+					<a class="page-link" asp-controller="Books" asp-action="Search" asp-route-page="@p" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending">@p</a>
+				</li>
+			}
+		}
+		@if(currentPage < totalPages) 
+		{
+			<li class="page-item">
+				<a class="page-link" asp-controller="Books" asp-action="Search" asp-route-page="@(currentPage + 1)" asp-route-searchTitle="@input.SearchTitle" asp-route-searchAuthor="@input.SearchAuthor" asp-route-orderby="@input.OrderBy" asp-route-ascending="@input.Ascending"><i class="fas fas fa-angle-right"></i></a>
+			</li>
+		}
+	</ul>
+</nav>
+}

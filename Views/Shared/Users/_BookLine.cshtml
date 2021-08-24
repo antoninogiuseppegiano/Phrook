@@ -1,0 +1,24 @@
+@model BookViewModel
+
+<hr>
+<div class="row book-library">
+    <div class="col-md-1">
+        <img src="@Model.ImagePath" width="52" height="52">
+    </div>
+    <div class="col-md-4">
+        <h2>@Model.Title</h2>
+        <author>@Model.Author</author>
+    </div>
+	<div class="col-md-2 d-flex align-items-center rating" title="@Model.Rating">
+		<rating value="@Model.Rating"></rating>	
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+        @Model.Tag
+    </div>
+	<div class="col-md-1 d-flex align-items-center">
+        @Model.ReadingState
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+      <a class="btn btn-outline-primary btn-lg" asp-controller="Books" asp-action="OverviewById" asp-route-id="@Model.Id">Vai</a>  
+    </div>
+</div>

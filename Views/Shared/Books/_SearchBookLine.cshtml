@@ -1,0 +1,34 @@
+@model SearchedBookViewModel
+
+<hr>
+<div class="row book-library search">
+	<div class="col-md-1">
+		<img src="@Model.ImagePath" width="52" height="52">
+	</div>
+	<div class="col-md-4">
+		<h2>@Model.Title</h2>
+		<author>@Model.Author</author>
+	</div>
+	<div class="col-md-2 d-flex align-items-center">
+		@Model.ISBN
+	</div>
+	@if(Model.IsInLibrary)
+	{
+	<div class="col-md-2 d-flex align-items-center"></div>
+	<div class="col-md-2 d-flex align-items-center">
+		<a class="btn btn-outline-primary btn-lg" asp-action="Detail" asp-route-id="@Model.Id">Dettaglio</a>  
+	</div>
+	}
+	else
+	{
+	<div class="col-md-2 d-flex align-items-center">
+		<form method="post" asp-controller="Books" asp-action="AddToLibrary">
+			<input type="hidden" asp-for="Id">
+			<button type="submit" class="btn btn-warning btn-lg btn-block button-book">Aggiungi</button>
+		</form>
+	</div>
+	<div class="col-md-2 d-flex align-items-center">
+		<a class="btn btn-outline-primary btn-lg" asp-action="OverviewById" asp-route-id="@Model.Id">Panoramica</a>  
+	</div>
+	}
+</div>

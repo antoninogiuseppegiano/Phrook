@@ -1,0 +1,34 @@
+@model BookDetailViewModel
+<section class="book-detail mt-2">
+    <div class="row">
+        <div class="col-md-9">
+			<div class="row">
+				<h1 class="mb-0">@Model.Title</h1>
+				<span class="isbn">ISBN: @Model.ISBN</span>
+				<author>di @Model.Author</author>
+			</div>
+			<div class="row">
+				<p>@Html.Raw(Model.Description)</p>
+			</div>
+        </div>
+        <div class="col-md-3">
+            <aside class=" d-flex flex-column align-items-center">
+                <img src="@Model.ImagePath" class="img-fluid book-image mb-3" alt="@Model.Title">
+				<div class="rating d-flex justify-content-center" title="@Model.Rating">
+                    <rating value="@Model.Rating"></rating>
+                </div>
+				@if(@Model.ReadingState != "Non letto" && !string.IsNullOrWhiteSpace(Model.InitialTime))
+				{
+				<p>Iniziato: <span>@Model.InitialTime</span></p>
+					@if(@Model.ReadingState != "In lettura" && !string.IsNullOrWhiteSpace(Model.FinalTime))
+					{
+						<p>Finito: <span>@Model.FinalTime</span></p>
+					}
+				}
+				<p class="mb-1"><span>@(!string.IsNullOrWhiteSpace(Model.Tag) ? Html.Raw($"{@Model.Tag}</span> - <span>") : "")@Model.ReadingState</span></p>
+				<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-pencil-alt"></i> Modifica</a>
+			</aside>
+        </div>
+    </div>
+
+</section>
