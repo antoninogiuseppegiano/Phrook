@@ -72,14 +72,14 @@ namespace Phrook.Models.Services.HttpClients
 				using var responseStream = await _client.GetStreamAsync(GetApiUrl(id, GoogleBooksApiType.Id));
 				var deserialized = await JsonSerializer.DeserializeAsync<GoogleBooksApiByIdResponseModel>(responseStream);
 
+				string image = deserialized.VolumeInfo.ImageLinks == null ? "#" : deserialized.VolumeInfo.ImageLinks.Thumbnail.ToString();
 				BookOverviewViewModel viewModel = new()
 				{
 					Id = deserialized.Id,
 					ISBN = deserialized.VolumeInfo.IndustryIdentifiers.Where(ii => ii.Type.Equals("ISBN_13", StringComparison.InvariantCultureIgnoreCase)).Select(ii => ii.Identifier).SingleOrDefault(),
 					Title = deserialized.VolumeInfo.Title,
-					// Author = deserialized.VolumeInfo.Authors.Aggregate("", (authors, next) => authors += " - " + next),
 					Author = string.Join(" - ", deserialized.VolumeInfo.Authors),
-					ImagePath = deserialized.VolumeInfo.ImageLinks.Thumbnail.ToString(),
+					ImagePath = image,
 					Description = deserialized.VolumeInfo.Description
 				};
 				return viewModel;

@@ -57,19 +57,28 @@ namespace Phrook.Models.Services.Application
 
 		public async Task RemoveBookFromWishlist(string currentUserId, string bookId)
 		{
-			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
-			if (affectedRows is 1)
-			{
-				await dbContext.SaveChangesAsync();
-			}
-			else if (affectedRows is 0)
-			{
-				throw new BookNotFoundException();
-			}
-			else
-			{
-				throw new TooManyRowsException(affectedRows);
-			}
+			//EF Core Plus cannot work with ObjectContext as DbContext (mocked in testing)
+			// int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
+			// if (affectedRows is 1)
+			// {
+			// 	await dbContext.SaveChangesAsync();
+			// }
+			// else if (affectedRows is 0)
+			// {
+			// 	throw new BookNotFoundException();
+			// }
+			// else
+			// {
+			// 	throw new TooManyRowsException(affectedRows);
+			// }
+
+			Wishlist wishlist = await dbContext.Wishlist.Where(wishlist => wishlist.UserId == currentUserId && wishlist.BookId == bookId).SingleAsync();
+            if (wishlist == null)
+            {
+                throw new BookNotFoundException(bookId);
+            }
+			dbContext.Remove(wishlist);
+            await dbContext.SaveChangesAsync();
 		}
 
 		public async Task AddBookToWishlist(string currentUserId, string bookId)

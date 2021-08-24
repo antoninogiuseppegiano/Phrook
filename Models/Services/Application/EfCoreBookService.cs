@@ -201,10 +201,36 @@ namespace Phrook.Models.Services.Application
 				.FirstOrDefaultAsync();
 
 			book.ChangeRating(inputModel.Rating);
-			book.ChangeTag(inputModel.Tag);
-			book.ChangeReadingState(inputModel.ReadingState);
-			book.ChangeInitialTime(inputModel.InitialTime);
-			book.ChangeFinalTime(inputModel.FinalTime);
+			if(!string.IsNullOrEmpty(inputModel.Tag))
+			{
+				book.ChangeTag(inputModel.Tag);
+			}
+			if(!string.IsNullOrEmpty(inputModel.ReadingState))
+			{
+				book.ChangeReadingState(inputModel.ReadingState);
+			}
+
+			switch(inputModel.ReadingState)
+			{
+				case "0":
+					book.ChangeInitialTime(DateTime.MinValue.Date);
+					book.ChangeFinalTime(DateTime.MinValue.Date);
+					break;
+				case "1":
+						book.ChangeInitialTime(inputModel.InitialTime);
+					book.ChangeFinalTime(DateTime.MinValue.Date);
+					break;
+				case "2":
+				case "3":
+						book.ChangeInitialTime(inputModel.InitialTime);
+						book.ChangeFinalTime(inputModel.FinalTime);
+					break;
+				default:
+					book.ChangeInitialTime(DateTime.MinValue.Date);
+					book.ChangeFinalTime(DateTime.MinValue.Date);
+					break;
+				
+			}
 
 			dbContext.Entry(book).Property(book => book.RowVersion).OriginalValue = inputModel.RowVersion;
 
@@ -270,38 +296,55 @@ namespace Phrook.Models.Services.Application
 
 		public async Task RemoveBookFromLibrary(string currentUserId, string bookId)
 		{
-			int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).DeleteAsync();
-			if (affectedRows is 1)
-			{
-				await dbContext.SaveChangesAsync();
-			}
-			else if (affectedRows is 0)
-			{
-				throw new BookNotFoundException();
-			}
-			else
-			{
-				throw new TooManyRowsException(affectedRows);
-			}
+			//EF Core Plus cannot work with ObjectContext as DbContext (mocked in testing)
+			//int affectedRows = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).DeleteAsync();
+			// if (affectedRows is 1)
+			// {
+			// 	await dbContext.SaveChangesAsync();
+			// }
+			// else if (affectedRows is 0)
+			// {
+			// 	throw new BookNotFoundException();
+			// }
+			// else
+			// {
+			// 	throw new TooManyRowsException(affectedRows);
+			// }
+			
+			LibraryBook libraryBook = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).SingleOrDefaultAsync();
+            if (libraryBook == null)
+            {
+                throw new BookNotFoundException(bookId);
+            }
+			dbContext.Remove(libraryBook);
+            await dbContext.SaveChangesAsync();
 
 			//Per avere db più snello, rimuove riga del db se nessun utente ha più quel libro
-			// eliminazione dal db con EF Core PLUS
 			bool isStillInLibrary = await dbContext.LibraryBooks.Where(libraryBook => libraryBook.BookId == bookId).CountAsync() > 0;
 			if(!isStillInLibrary)
 			{
-				affectedRows = await dbContext.Books.Where(book =>  book.BookId == bookId).DeleteAsync();
-				if (affectedRows is 1)
+				//EF Core Plus cannot work with ObjectContext as DbContext (mocked in testing)
+				// affectedRows = await dbContext.Books.Where(book =>  book.BookId == bookId).DeleteAsync();
+				// if (affectedRows is 1)
+				// {
+				// 	await dbContext.SaveChangesAsync();
+				// }
+				// else if (affectedRows is 0)
+				// {
+				// 	throw new BookNotFoundException();
+				// }
+				// else
+				// {
+				// 	throw new TooManyRowsException(affectedRows);
+				// }
+
+				Book book = await dbContext.Books.Where(book => book.BookId == bookId).SingleOrDefaultAsync();
+				if (book == null)
 				{
-					await dbContext.SaveChangesAsync();
+					throw new BookNotFoundException(bookId);
 				}
-				else if (affectedRows is 0)
-				{
-					throw new BookNotFoundException();
-				}
-				else
-				{
-					throw new TooManyRowsException(affectedRows);
-				}
+				dbContext.Remove(book);
+				await dbContext.SaveChangesAsync();
 			}
 			
 		}
@@ -349,15 +392,23 @@ namespace Phrook.Models.Services.Application
 			}
 
 			//Removing from wishlist
-			int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
-			if (affectedRows is 1)
-			{
-				await dbContext.SaveChangesAsync();
-			}
-			else if( affectedRows > 1)
-			{
-				throw new TooManyRowsException(affectedRows);
-			}
+			//EF Core Plus cannot work with ObjectContext as DbContext (mocked in testing)
+			// int affectedRows = await dbContext.Wishlist.Where(wishlist => wishlist.BookId == bookId && wishlist.UserId == currentUserId).DeleteAsync();
+			// if (affectedRows is 1)
+			// {
+			// 	await dbContext.SaveChangesAsync();
+			// }
+			// else if( affectedRows > 1)
+			// {
+			// 	throw new TooManyRowsException(affectedRows);
+			// }
+			Wishlist wishlist = await dbContext.Wishlist.Where(libraryBook => libraryBook.UserId == currentUserId && libraryBook.BookId == bookId).SingleOrDefaultAsync();
+            if (wishlist != null)
+            {
+               	dbContext.Remove(wishlist);
+            	await dbContext.SaveChangesAsync();
+            }
+			
 		}
 
 		public async Task<bool> IsBookStoredInBooks(string bookId)

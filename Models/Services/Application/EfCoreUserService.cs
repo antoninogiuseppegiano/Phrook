@@ -113,7 +113,7 @@ namespace Phrook.Models.Services.Application
 			}
 			string fullName = await dbContext.Users
 			.AsNoTracking().Where(user => user.Id == userId)
-			.Select(user => user.FullName).SingleOrDefaultAsync();
+			.Select(user => user.FullName).SingleAsync();
 
 			return fullName;
 		}

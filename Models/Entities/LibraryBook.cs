@@ -12,15 +12,14 @@ namespace Phrook.Models.Entities
 	{
 		public LibraryBook(string bookId, string userId)
         {
-			//TODO: validazione bookId e userId
-		    /* if ()
+		    if (string.IsNullOrWhiteSpace(bookId))
             {
                 throw new ArgumentException("Il libro non esiste"); //BookNotFoundException
             }
-			if ()
+			if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new ArgumentException("L'utente non esiste");
-            }  */  
+            } 
             BookId = bookId;
             UserId = userId;
 			Rating = 0;
