@@ -1,5 +1,3 @@
-using Phrook.Models.InputModels;
-
 namespace Phrook.Models.ViewModels
 {
     public class SearchUserListViewModel

@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Phrook.Models.ResponseModels;
 using Phrook.Models.ViewModels;
 
 namespace Phrook.Models.Services.HttpClients

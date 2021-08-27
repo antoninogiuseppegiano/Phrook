@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
-using Phrook.Customizations.ModelBinders;
 using Phrook.Models.Enums;
-using Phrook.Customizations.ExtensionMethods;
 
 namespace Phrook.Models.InputModels
 {

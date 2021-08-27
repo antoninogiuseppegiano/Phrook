@@ -9,7 +9,6 @@ using Phrook.Models.Enums;
 using Phrook.Models.Exceptions;
 using Phrook.Models.Options;
 using Phrook.Models.ResponseModels;
-using Phrook.Models.Services.Application;
 using Phrook.Models.ViewModels;
 
 namespace Phrook.Models.Services.HttpClients

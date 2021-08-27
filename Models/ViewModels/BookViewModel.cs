@@ -1,5 +1,3 @@
-using Phrook.Models.Enums;
-
 namespace Phrook.Models.ViewModels
 {
     public class BookViewModel

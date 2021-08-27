@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Phrook.Models.Entities
 {
     public class Wishlist

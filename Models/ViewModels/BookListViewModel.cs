@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Phrook.Models.InputModels;
 
 namespace Phrook.Models.ViewModels
